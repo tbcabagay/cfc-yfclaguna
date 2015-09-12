@@ -38,14 +38,24 @@ $config = [
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),
+        'authClientCollection' => [
+            'class' => 'yii\authclient\Collection',
+            'clients' => [
+                'google' => [
+                    'class' => 'yii\authclient\clients\GoogleOAuth',
+                    'clientId' => '1033242369377-fmp3ths9tj1kd4bjh8qkjvq76jsf27f4.apps.googleusercontent.com',
+                    'clientSecret' => 'zgOh_GQpPEfhKbm8dpRk9Sv3',
+                ],
+            ],
+        ],
+        'formatter' => [
+            'defaultTimeZone' => 'Asia/Manila',
+        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'enableStrictParsing' => false,
             'suffix' => '.html',
-        ],
-        'formatter' => [
-            'defaultTimeZone' => 'Asia/Manila',
         ],
     ],
     'params' => $params,
