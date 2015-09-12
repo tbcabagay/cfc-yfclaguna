@@ -44,6 +44,9 @@ $config = [
             'enableStrictParsing' => false,
             'suffix' => '.html',
         ],
+        'formatter' => [
+            'defaultTimeZone' => 'Asia/Manila',
+        ],
     ],
     'params' => $params,
 ];
