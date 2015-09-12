@@ -9,7 +9,7 @@ class m150912_160522_create_user_profile_table extends Migration
     {
         $this->createTable('user_profile', [
             'id' => $this->primaryKey(),
-            'user_id' => $this->integer(),
+            'user_id' => $this->integer()->notNull(),
             'family_name' => $this->string(100)->notNull(),
             'given_name' => $this->string(100)->notNull(),
             'image' => $this->string(300)->notNull(),
