@@ -9,7 +9,7 @@ class m150912_164856_create_auth_table extends Migration
     {
         $this->createTable('auth', [
             'id' => $this->primaryKey(),
-            'user_id' => $this->integer->notNull(),
+            'user_id' => $this->integer()->notNull(),
             'source' => $this->string(255)->notNull(),
             'source_id' => $this->string(255)->notNull(),
         ]);

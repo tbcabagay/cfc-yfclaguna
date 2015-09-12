@@ -45,6 +45,7 @@ $config = [
                     'class' => 'yii\authclient\clients\GoogleOAuth',
                     'clientId' => '1033242369377-fmp3ths9tj1kd4bjh8qkjvq76jsf27f4.apps.googleusercontent.com',
                     'clientSecret' => 'zgOh_GQpPEfhKbm8dpRk9Sv3',
+                    'returnUrl' => 'http://cfc-yfclaguna.org/site/auth.html?authclient=google',
                 ],
             ],
         ],

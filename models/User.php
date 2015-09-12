@@ -101,7 +101,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * @inheritdoc
      */
-    public function getauth_key()
+    public function getAuthKey()
     {
         return $this->auth_key;
     }
@@ -109,7 +109,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * @inheritdoc
      */
-    public function validateauth_key($auth_key)
+    public function validateAuthKey($auth_key)
     {
         return $this->auth_key === $auth_key;
     }
