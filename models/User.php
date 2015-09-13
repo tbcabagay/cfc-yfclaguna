@@ -12,7 +12,7 @@ use yii\web\IdentityInterface;
  * @property string $auth_key
  * @property string $email
  * @property integer $status
- * @property integer $role
+ * @property string $role
  * @property string $created_at
  * @property string $updated_at
  *
@@ -28,7 +28,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios[self::SCENARIO_REGISTER] = ['email'];
+        $scenarios[self::SCENARIO_REGISTER] = ['email', 'role'];
         return $scenarios;
     }
 
@@ -47,10 +47,12 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return [
             [['auth_key', 'email', 'status', 'role', 'created_at'], 'required'],
-            [['status', 'role'], 'integer'],
+            [['email'], 'email'],
+            [['status'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['auth_key'], 'string', 'max' => 32],
-            [['email'], 'string', 'max' => 255]
+            [['email'], 'string', 'max' => 255],
+            [['role'], 'string', 'max' => 15]
         ];
     }
 
@@ -75,7 +77,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function getAuths()
     {
-        return $this->hasMany(Auth::className(), ['user_id' => 'id']);
+        return $this->hasOne(Auth::className(), ['user_id' => 'id']);
     }
 
     /**
@@ -83,7 +85,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function getUserProfiles()
     {
-        return $this->hasMany(UserProfile::className(), ['user_id' => 'id']);
+        return $this->hasOne(UserProfile::className(), ['user_id' => 'id']);
     }
 
     /**
@@ -131,6 +133,18 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public function validateAuthKey($authKey)
     {
         return $this->getAuthKey() === $authKey;
+    }
+
+    public function getRoleTypes()
+    {
+        $items = ['' => 'Choose...'];
+        $roles = \Yii::$app->authManager->getRoles();
+
+        foreach ($roles as $role) {
+            $items[$role->name] = $role->name;
+        }
+
+        return $items;
     }
 
     public function beforeSave($insert)
