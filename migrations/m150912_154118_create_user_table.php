@@ -21,8 +21,6 @@ class m150912_154118_create_user_table extends Migration
 
     public function down()
     {
-        echo "dropping table `user`";
-
         $this->dropTable('user');
     }
 

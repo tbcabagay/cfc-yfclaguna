@@ -15,14 +15,14 @@ class m150912_160522_create_user_profile_table extends Migration
             'image' => $this->string(300)->notNull(),
         ]);
 
-        $this->addForeignKey('fk_user_userprofile', 'user_profile', 'user_id', 'user', 'id', null, 'CASCADE');
+        $this->addForeignKey('fk_user_userprofile', 'user_profile', 'user_id', 'user', 'id', 'CASCADE', 'CASCADE');
     }
 
     public function down()
     {
-        echo "dropping table `user_profile`";
-
+        $this->execute('SET foreign_key_checks = 0;');
         $this->dropTable('user_profile');
+        $this->execute('SET foreign_key_checks = 1;');
     }
 
     /*

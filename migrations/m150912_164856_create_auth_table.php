@@ -14,14 +14,14 @@ class m150912_164856_create_auth_table extends Migration
             'source_id' => $this->string(255)->notNull(),
         ]);
 
-        $this->addForeignKey('fk_user_auth', 'auth', 'user_id', 'user', 'id', null, 'CASCADE');
+        $this->addForeignKey('fk_user_auth', 'auth', 'user_id', 'user', 'id', 'CASCADE', 'CASCADE');
     }
 
     public function down()
     {
-        echo "dropping table `auth`";
-
-        $this->dropTable('user');
+        $this->execute('SET foreign_key_checks = 0;');
+        $this->dropTable('auth');
+        $this->execute('SET foreign_key_checks = 1;');
     }
 
     /*

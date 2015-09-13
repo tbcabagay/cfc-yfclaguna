@@ -3,8 +3,6 @@
 namespace app\models;
 
 use Yii;
-use yii\web\IdentityInterface;
-use yii\db\Expression;
 
 /**
  * This is the model class for table "user".
@@ -18,21 +16,11 @@ use yii\db\Expression;
  * @property string $created_at
  * @property string $updated_at
  *
+ * @property Auth[] $auths
  * @property UserProfile[] $userProfiles
  */
-class User extends \yii\db\ActiveRecord implements IdentityInterface
+class User extends \yii\db\ActiveRecord
 {
-    const SCENARIO_REGISTER = 'register';
-    const STATUS_ACTIVE = 1;
-    const STATUS_INACTIVE = 0;
-
-    public function scenarios()
-    {
-        $scenarios = parent::scenarios();
-        $scenarios[self::SCENARIO_REGISTER] = ['email'];
-        return $scenarios;
-    }
-
     /**
      * @inheritdoc
      */
@@ -48,11 +36,10 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return [
             [['auth_key', 'email', 'status', 'role', 'created_at'], 'required'],
-            [['email'], 'email'],
             [['status', 'role', 'is_deleted'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['auth_key'], 'string', 'max' => 32],
-            [['email'], 'string', 'max' => 100]
+            [['email'], 'string', 'max' => 255]
         ];
     }
 
@@ -76,68 +63,16 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getAuths()
+    {
+        return $this->hasMany(Auth::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getUserProfiles()
     {
-        return $this->hasOne(UserProfile::className(), ['user_id' => 'id']);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function findIdentity($id)
-    {
-        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function findIdentityByAccessToken($token, $type = null)
-    {
-        foreach (self::$users as $user) {
-            if ($user['accessToken'] === $token) {
-                return new static($user);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getAuthKey()
-    {
-        return $this->auth_key;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function validateAuthKey($auth_key)
-    {
-        return $this->auth_key === $auth_key;
-    }
-
-    public function beforeSave($insert)
-    {
-        if (parent::beforeSave($insert)) {
-            if ($insert) {
-                $this->created_at = new Expression('NOW()');
-                $this->auth_key = \Yii::$app->security->generateRandomString();
-            }
-
-        return true;
-        }
-
-        return false;
+        return $this->hasMany(UserProfile::className(), ['user_id' => 'id']);
     }
 }
