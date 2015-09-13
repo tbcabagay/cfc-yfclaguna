@@ -3,7 +3,8 @@
 namespace app\models;
 
 use Yii;
-use \yii\web\IdentityInterface;
+use yii\web\IdentityInterface;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "user".
@@ -21,6 +22,17 @@ use \yii\web\IdentityInterface;
  */
 class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
+    const SCENARIO_REGISTER = 'register';
+    const STATUS_ACTIVE = 1;
+    const STATUS_INACTIVE = 0;
+
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios[self::SCENARIO_REGISTER] = ['email'];
+        return $scenarios;
+    }
+
     /**
      * @inheritdoc
      */
@@ -36,6 +48,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return [
             [['auth_key', 'email', 'status', 'role', 'created_at'], 'required'],
+            [['email'], 'email'],
             [['status', 'role', 'is_deleted'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['auth_key'], 'string', 'max' => 32],
@@ -118,6 +131,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     {
         if (parent::beforeSave($insert)) {
             if ($insert) {
+                $this->created_at = new Expression('NOW()');
                 $this->auth_key = \Yii::$app->security->generateRandomString();
             }
 
