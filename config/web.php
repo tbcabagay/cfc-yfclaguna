@@ -49,6 +49,9 @@ $config = [
                 ],
             ],
         ],
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager',
+        ],
         'formatter' => [
             'defaultTimeZone' => 'Asia/Manila',
         ],
@@ -60,8 +63,19 @@ $config = [
         ],
     ],
     'modules' => [
+        'qux' => [
+            'class' => 'app\modules\qux\Module',
+        ],
         'admin' => [
-            'class' => 'app\modules\admin\Module',
+            'class' => 'mdm\admin\Module',
+            'controllerMap' => [
+                'assignment' => [
+                    'class' => 'mdm\admin\controllers\AssignmentController',
+                    'idField' => 'user_id',
+                    'searchClass' => 'app\models\UserSearch',
+                ],
+            ],
+            'layout' => 'left-menu',
         ],
     ],
     'params' => $params,

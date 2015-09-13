@@ -19,9 +19,9 @@ class m150912_164856_create_auth_table extends Migration
 
     public function down()
     {
-        $this->execute('SET foreign_key_checks = 0;');
+        $this->execute('SET FOREIGN_KEY_CHECKS = 0;');
         $this->dropTable('auth');
-        $this->execute('SET foreign_key_checks = 1;');
+        $this->execute('SET FOREIGN_KEY_CHECKS = 1;');
     }
 
     /*

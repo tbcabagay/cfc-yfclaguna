@@ -13,7 +13,6 @@ class m150912_154118_create_user_table extends Migration
             'email' => $this->string(255)->notNull(),
             'status' => $this->smallInteger(6)->notNull(),
             'role' => $this->smallInteger(3)->notNull(),
-            'is_deleted' => $this->boolean(),
             'created_at' => $this->dateTime()->notNull(),
             'updated_at' => $this->dateTime(),
         ]);

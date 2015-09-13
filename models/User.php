@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\web\IdentityInterface;
 
 /**
  * This is the model class for table "user".
@@ -12,15 +13,25 @@ use Yii;
  * @property string $email
  * @property integer $status
  * @property integer $role
- * @property integer $is_deleted
  * @property string $created_at
  * @property string $updated_at
  *
  * @property Auth[] $auths
  * @property UserProfile[] $userProfiles
  */
-class User extends \yii\db\ActiveRecord
+class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
+    const SCENARIO_REGISTER = 'register';
+    const STATUS_ACTIVE = 1;
+    const STATUS_DELETE = 0;
+
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios[self::SCENARIO_REGISTER] = ['email'];
+        return $scenarios;
+    }
+
     /**
      * @inheritdoc
      */
@@ -36,7 +47,7 @@ class User extends \yii\db\ActiveRecord
     {
         return [
             [['auth_key', 'email', 'status', 'role', 'created_at'], 'required'],
-            [['status', 'role', 'is_deleted'], 'integer'],
+            [['status', 'role'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['auth_key'], 'string', 'max' => 32],
             [['email'], 'string', 'max' => 255]
@@ -54,7 +65,6 @@ class User extends \yii\db\ActiveRecord
             'email' => 'Email',
             'status' => 'Status',
             'role' => 'Role',
-            'is_deleted' => 'Is Deleted',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
@@ -74,5 +84,67 @@ class User extends \yii\db\ActiveRecord
     public function getUserProfiles()
     {
         return $this->hasMany(UserProfile::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * Finds an identity by the given ID.
+     *
+     * @param string|integer $id the ID to be looked for
+     * @return IdentityInterface|null the identity object that matches the given ID.
+     */
+    public static function findIdentity($id)
+    {
+        return static::findOne($id);
+    }
+
+    /**
+     * Finds an identity by the given token.
+     *
+     * @param string $token the token to be looked for
+     * @return IdentityInterface|null the identity object that matches the given token.
+     */
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+        return static::findOne(['access_token' => $token]);
+    }
+
+    /**
+     * @return int|string current user ID
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return string current user auth key
+     */
+    public function getAuthKey()
+    {
+        return $this->auth_key;
+    }
+
+    /**
+     * @param string $authKey
+     * @return boolean if auth key is valid for current user
+     */
+    public function validateAuthKey($authKey)
+    {
+        return $this->getAuthKey() === $authKey;
+    }
+
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if ($this->isNewRecord) {
+                $this->status = self::STATUS_ACTIVE;
+                $this->created_at = new \yii\db\Expression('NOW()');
+                $this->auth_key = \Yii::$app->security->generateRandomString();
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }
