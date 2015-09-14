@@ -10,17 +10,23 @@ class m150912_154118_create_user_table extends Migration
         $this->createTable('user', [
             'id' => $this->primaryKey(),
             'auth_key' => $this->string(32)->notNull(),
+            'division' => $this->string(15)->notNull(),
+            'service_id' => $this->integer(),
             'email' => $this->string(255)->notNull(),
-            'status' => $this->smallInteger(6)->notNull(),
+            'status' => $this->smallInteger()->notNull(),
             'role' => $this->string(15)->notNull(),
             'created_at' => $this->dateTime()->notNull(),
             'updated_at' => $this->dateTime(),
         ]);
+
+        $this->addForeignKey('fk_service_user', 'user', 'service_id', 'service', 'id', 'CASCADE', 'CASCADE');
     }
 
     public function down()
     {
+        $this->execute('SET FOREIGN_KEY_CHECKS = 0;');
         $this->dropTable('user');
+        $this->execute('SET FOREIGN_KEY_CHECKS = 1;');
     }
 
     /*

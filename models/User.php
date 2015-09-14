@@ -148,7 +148,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return $items;
     }
 
-    public function filterStatus()
+    public function getStatusTypes()
     {
         return [
             self::STATUS_ACTIVE => 'STATUS_ACTIVE',
@@ -156,7 +156,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         ];
     }
 
-    public function getStatus($id)
+    public function filterStatus($id)
     {
         if ($id === self::STATUS_ACTIVE)
             return 'STATUS_ACTIVE';

@@ -21,9 +21,9 @@ $this->params['breadcrumbs'][] = $this->title;
             'email:email',
             [
                 'attribute' => 'status',
-                'filter' => Html::activeDropDownList($searchModel, 'status', $searchModel->filterStatus(), ['class'=>'form-control','prompt' => '']),
+                'filter' => Html::activeDropDownList($searchModel, 'status', $searchModel->getStatusTypes(), ['class'=>'form-control','prompt' => '']),
                 'value' => function($model, $index, $wisget) {
-                    return $model->getStatus($model->status);
+                    return $model->filterStatus($model->status);
                 },
             ],
             'role',
