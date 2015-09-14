@@ -65,6 +65,11 @@ $config = [
     'modules' => [
         'qux' => [
             'class' => 'app\modules\qux\Module',
+            'layoutPath' => '@app/modules/qux/views/layouts',
+            'layout' => 'main',
+        ],
+        'gridview' => [
+            'class' => '\kartik\grid\Module',
         ],
         'admin' => [
             'class' => 'mdm\admin\Module',

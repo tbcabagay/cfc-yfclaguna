@@ -148,6 +148,22 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return $items;
     }
 
+    public function filterStatus()
+    {
+        return [
+            self::STATUS_ACTIVE => 'STATUS_ACTIVE',
+            self::STATUS_DELETE => 'STATUS_DELETE',
+        ];
+    }
+
+    public function getStatus($id)
+    {
+        if ($id === self::STATUS_ACTIVE)
+            return 'STATUS_ACTIVE';
+        else if ($id === self::STATUS_DELETE)
+            return 'STATUS_DELETE';
+    }
+
     public function beforeSave($insert)
     {
         if (parent::beforeSave($insert)) {

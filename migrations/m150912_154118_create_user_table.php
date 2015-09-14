@@ -12,7 +12,7 @@ class m150912_154118_create_user_table extends Migration
             'auth_key' => $this->string(32)->notNull(),
             'email' => $this->string(255)->notNull(),
             'status' => $this->smallInteger(6)->notNull(),
-            'role' => $this->smallInteger(3)->notNull(),
+            'role' => $this->string(15)->notNull(),
             'created_at' => $this->dateTime()->notNull(),
             'updated_at' => $this->dateTime(),
         ]);

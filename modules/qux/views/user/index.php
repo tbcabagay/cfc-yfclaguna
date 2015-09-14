@@ -1,7 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
+use kartik\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\UserSearch */
@@ -12,28 +12,58 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="user-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
-    <p>
-        <?= Html::a('Create User', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
-            'auth_key',
             'email:email',
-            'status',
+            [
+                'attribute' => 'status',
+                'filter' => Html::activeDropDownList($searchModel, 'status', $searchModel->filterStatus(), ['class'=>'form-control','prompt' => '']),
+                'value' => function($model, $index, $wisget) {
+                    return $model->getStatus($model->status);
+                },
+            ],
             'role',
-            // 'created_at',
-            // 'updated_at',
+            [
+                'attribute' => 'created_at',
+                'value' => 'created_at',
+                'filterType' => GridView::FILTER_DATE,
+                'filterWidgetOptions' => [
+                    'pluginOptions' => [
+                        'format' => 'yyyy-mm-dd',
+                        'autoclose' => true,
+                        'todayHighlight' => true,
+                    ],
+                ],
+            ],
+            [
+                'attribute' => 'updated_at',
+                'value' => 'updated_at',
+                'filterType' => GridView::FILTER_DATE,
+                'filterWidgetOptions' => [
+                    'pluginOptions' => [
+                        'format' => 'yyyy-mm-dd',
+                        'autoclose' => true,
+                        'todayHighlight' => true,
+                    ],
+                ],
+            ],
 
             ['class' => 'yii\grid\ActionColumn'],
+        ],
+        'panel' => [
+            'type' => GridView::TYPE_PRIMARY,
+            'heading' => '<span class="glyphicon glyphicon-user"></span> Users',
+        ],
+        'condensed' => true,
+        'hover' => true,
+        'toolbar'=> [
+            [
+                'content' => Html::a('<span class="glyphicon glyphicon-plus"></span> Create User', ['create'], ['class' => 'btn btn-success', 'title' => 'Create User'])
+            ],
         ],
     ]); ?>
 
