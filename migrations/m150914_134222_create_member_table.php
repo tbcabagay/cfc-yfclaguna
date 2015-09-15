@@ -7,14 +7,31 @@ class m150914_134222_create_member_table extends Migration
 {
     public function up()
     {
+        $this->createTable('member', [
+            'id' => $this->primaryKey(),
+            'service_id' => $this->smallInteger()->notNull(),
+            'cluster_id' => $this->integer()->notNull(),
+            'username' => $this->string(50)->notNull(),
+            'password' => $this->string(100)->notNull(),
+            'family_name' => $this->string(100)->notNull(),
+            'given_name' => $this->string(100)->notNull(),
+            'address' => $this->string(300)->notNull(),
+            'email' => $this->string(255)->notNull(),
+            'birthday' => $this->date()->notNull(),
+            'status' => $this->smallInteger()->notNull(),
+            'joined_at' => $this->date(),
+            'venue' => $this->string(200),
+        ]);
 
+        $this->addForeignKey('fk_service_member', 'member', 'service_id', 'service', 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey('fk_cluster_member', 'member', 'cluster_id', 'cluster', 'id', 'CASCADE', 'CASCADE');
     }
 
     public function down()
     {
-        echo "m150914_134222_create_member_table cannot be reverted.\n";
-
-        return false;
+        $this->execute('SET FOREIGN_KEY_CHECKS = 0;');
+        $this->dropTable('member');
+        $this->execute('SET FOREIGN_KEY_CHECKS = 1;');
     }
 
     /*

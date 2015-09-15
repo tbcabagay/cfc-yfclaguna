@@ -5,12 +5,12 @@ namespace app\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\User;
+use app\models\Sector;
 
 /**
- * UserSearch represents the model behind the search form about `app\models\User`.
+ * SectorSearch represents the model behind the search form about `app\models\Sector`.
  */
-class UserSearch extends User
+class SectorSearch extends Sector
 {
     /**
      * @inheritdoc
@@ -18,8 +18,8 @@ class UserSearch extends User
     public function rules()
     {
         return [
-            [['id', 'service_id', 'status'], 'integer'],
-            [['auth_key', 'division', 'email', 'role', 'created_at', 'updated_at'], 'safe'],
+            [['id', 'provincial_id'], 'integer'],
+            [['label'], 'safe'],
         ];
     }
 
@@ -41,7 +41,7 @@ class UserSearch extends User
      */
     public function search($params)
     {
-        $query = User::find();
+        $query = Sector::find();
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -57,16 +57,10 @@ class UserSearch extends User
 
         $query->andFilterWhere([
             'id' => $this->id,
-            'service_id' => $this->service_id,
-            'status' => $this->status,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'provincial_id' => $this->provincial_id,
         ]);
 
-        $query->andFilterWhere(['like', 'auth_key', $this->auth_key])
-            ->andFilterWhere(['like', 'division', $this->division])
-            ->andFilterWhere(['like', 'email', $this->email])
-            ->andFilterWhere(['like', 'role', $this->role]);
+        $query->andFilterWhere(['like', 'label', $this->label]);
 
         return $dataProvider;
     }

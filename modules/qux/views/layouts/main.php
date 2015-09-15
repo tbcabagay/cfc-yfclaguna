@@ -37,6 +37,12 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             ['label' => 'Users', 'url' => ['/qux/user/index']],
+            ['label' => 'Divisions', 'items' => [
+                ['label' => 'Provincial', 'url' => ['/qux/provincial/index']],
+                ['label' => 'Sector', 'url' => ['/qux/sector/index']],
+                ['label' => 'Cluster', 'url' => ['/qux/cluster/index']],
+                ['label' => 'Chapter', 'url' => ['/qux/chapter/index']],
+            ]],
             ['label' => 'About', 'url' => ['/site/about']],
             ['label' => 'Contact', 'url' => ['/site/contact']],
             Yii::$app->user->isGuest ?

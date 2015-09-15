@@ -8,7 +8,7 @@ class m150911_134249_create_service_table extends Migration
     public function up()
     {
         $this->createTable('service', [
-            'id' => $this->primaryKey(),
+            'id' => $this->smallInteger() . ' AUTO_INCREMENT PRIMARY KEY',
             'name' => $this->string(15)->notNull(),
         ]);
     }

@@ -3,30 +3,23 @@
 namespace app\models;
 
 use Yii;
+use yii\web\IdentityInterface;
 
 /**
  * This is the model class for table "user".
  *
  * @property integer $id
  * @property string $auth_key
- * @property string $division
- * @property integer $service_id
  * @property string $email
  * @property integer $status
  * @property string $role
  * @property string $created_at
  * @property string $updated_at
  *
- * @property Announcement[] $announcements
  * @property Auth[] $auths
- * @property Comment[] $comments
- * @property Document[] $documents
- * @property DocumentStatus[] $documentStatuses
- * @property DocumentStatus[] $documentStatuses0
- * @property Service $service
  * @property UserProfile[] $userProfiles
  */
-class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
+class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
     const SCENARIO_REGISTER = 'register';
     const STATUS_ACTIVE = 1;
@@ -53,14 +46,14 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
     public function rules()
     {
         return [
-            [['auth_key', 'division', 'email', 'status', 'role', 'created_at'], 'required'],
-            [['service_id', 'status'], 'integer'],
+            [['auth_key', 'email', 'status', 'role', 'created_at'], 'required'],
             [['email'], 'email'],
             [['email'], 'unique'],
+            [['status'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['auth_key'], 'string', 'max' => 32],
-            [['division', 'role'], 'string', 'max' => 15],
-            [['email'], 'string', 'max' => 255]
+            [['email'], 'string', 'max' => 255],
+            [['role'], 'string', 'max' => 15]
         ];
     }
 
@@ -72,8 +65,6 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
         return [
             'id' => 'ID',
             'auth_key' => 'Auth Key',
-            'division' => 'Division',
-            'service_id' => 'Service ID',
             'email' => 'Email',
             'status' => 'Status',
             'role' => 'Role',
@@ -85,57 +76,9 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getAnnouncements()
-    {
-        return $this->hasMany(Announcement::className(), ['user_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
     public function getAuths()
     {
-        return $this->hasMany(Auth::className(), ['user_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getComments()
-    {
-        return $this->hasMany(Comment::className(), ['user_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getDocuments()
-    {
-        return $this->hasMany(Document::className(), ['user_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getDocumentStatuses()
-    {
-        return $this->hasMany(DocumentStatus::className(), ['released_by' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getDocumentStatuses0()
-    {
-        return $this->hasMany(DocumentStatus::className(), ['received_by' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getService()
-    {
-        return $this->hasOne(Service::className(), ['id' => 'service_id']);
+        return $this->hasOne(Auth::className(), ['user_id' => 'id']);
     }
 
     /**
@@ -143,7 +86,7 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
      */
     public function getUserProfiles()
     {
-        return $this->hasMany(UserProfile::className(), ['user_id' => 'id']);
+        return $this->hasOne(UserProfile::className(), ['user_id' => 'id']);
     }
 
     /**
@@ -228,7 +171,6 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
                 $this->status = self::STATUS_ACTIVE;
                 $this->created_at = new \yii\db\Expression('NOW()');
                 $this->auth_key = \Yii::$app->security->generateRandomString();
-                $this->role = 'admin';
             }
 
             return true;

@@ -3,26 +3,29 @@
 use yii\db\Schema;
 use yii\db\Migration;
 
-class m150914_134133_create_announcement_table extends Migration
+class m150915_032450_create_document_table extends Migration
 {
     public function up()
     {
-        $this->createTable('announcement', [
+        $this->createTable('document', [
             'id' => $this->primaryKey(),
             'user_id' => $this->integer()->notNull(),
             'title' => $this->string(100)->notNull(),
-            'content' => $this->text()->notNull(),
+            'remarks' => $this->string(500)->notNull(),
+            'attachment' => $this->string(500)->notNull(),
             'status' => $this->smallInteger()->notNull(),
-            'created_at' => $this->dateTime()->notNull(),
+            'is_deleted' => $this->boolean()->notNull(),
+            'created_at' => $this->timestamp()->notNull(),
+            'time_difference' => $this->integer(),
         ]);
 
-        $this->addForeignKey('fk_user_announcement', 'announcement', 'user_id', 'user', 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey('fk_user_document', 'document', 'user_id', 'user', 'id', 'CASCADE', 'CASCADE');
     }
 
     public function down()
     {
         $this->execute('SET FOREIGN_KEY_CHECKS = 0;');
-        $this->dropTable('announcement');
+        $this->dropTable('document');
         $this->execute('SET FOREIGN_KEY_CHECKS = 1;');
     }
 

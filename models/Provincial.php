@@ -1,0 +1,54 @@
+<?php
+
+namespace app\models;
+
+use Yii;
+
+/**
+ * This is the model class for table "provincial".
+ *
+ * @property integer $id
+ * @property string $label
+ *
+ * @property Sector[] $sectors
+ */
+class Provincial extends \yii\db\ActiveRecord
+{
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return 'provincial';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['label'], 'required'],
+            [['label'], 'string', 'max' => 30]
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'label' => 'Label',
+        ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSectors()
+    {
+        return $this->hasMany(Sector::className(), ['provincial_id' => 'id']);
+    }
+}

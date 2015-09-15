@@ -7,14 +7,24 @@ class m150914_134149_create_comment_table extends Migration
 {
     public function up()
     {
+        $this->createTable('comment', [
+            'id' => $this->bigInteger() . ' AUTO_INCREMENT PRIMARY KEY',
+            'announcement_id' => $this->integer()->notNull(),
+            'user_id' => $this->integer()->notNull(),
+            'content' => $this->text()->notNull(),
+            'status' => $this->smallInteger()->notNull(),
+            'created_at' => $this->dateTime()->notNull(),
+        ]);
 
+        $this->addForeignKey('fk_announcement_comment', 'comment', 'announcement_id', 'announcement', 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey('fk_user_comment', 'comment', 'user_id', 'user', 'id', 'CASCADE', 'CASCADE');
     }
 
     public function down()
     {
-        echo "m150914_134149_create_comment_table cannot be reverted.\n";
-
-        return false;
+        $this->execute('SET FOREIGN_KEY_CHECKS = 0;');
+        $this->dropTable('comment');
+        $this->execute('SET FOREIGN_KEY_CHECKS = 1;');
     }
 
     /*
