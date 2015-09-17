@@ -1,15 +1,31 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
+use yii\web\View;
 use kartik\form\ActiveForm;
 
 
 /* @var $this yii\web\View */
-/* @var $model app\models\User */
+/* @var $user app\users\User */
 
 $this->title = 'Create User';
 $this->params['breadcrumbs'][] = ['label' => 'Users', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
+list(,$url)=Yii::$app->assetManager->publish('@vendor/kartik-v/dependent-dropdown');
+$this->registerCssFile($url . '/css/dependent-dropdown.min.css');
+$this->registerJsFile($url . '/js/dependent-dropdown.min.js', ['depends' => [\yii\web\JqueryAsset::className()]]);
+
+$divisionLabel = Html::getInputId($model, 'division_label');
+$divisionId = Html::getInputId($model, 'division_id');
+
+$this->registerJs("
+    $('#" . $divisionId . "').depdrop({
+        url: '" . Url::to('/qux/user/division') . "',
+        depends: ['" . $divisionLabel . "']
+    });
+", View::POS_END, 'dep-drop');
 ?>
 <div class="user-create">
 
@@ -22,6 +38,13 @@ $this->params['breadcrumbs'][] = $this->title;
         ]); ?>
 
         <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
+
+        <?= $form->field($model, 'service_id')->dropDownList($model->getServiceList(), ['prompt' => 'Select...']) ?>
+
+        <?= $form->field($model, 'division_label')->dropDownList($model->getDivisionList(), ['prompt' => 'Select...']) ?>
+
+        <?= $form->field($model, 'division_id')->dropDownList([], ['prompt' => 'Select...']) ?>
+
 <?php /*
         <?= $form->field($model, 'role')->dropdownList($model->getRoleTypes()) ?>
 */ ?>

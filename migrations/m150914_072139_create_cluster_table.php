@@ -14,6 +14,26 @@ class m150914_072139_create_cluster_table extends Migration
         ]);
 
         $this->addForeignKey('fk_sector_cluster', 'cluster', 'sector_id', 'sector', 'id', 'CASCADE', 'CASCADE');
+
+        $this->insert('cluster', [
+            'sector_id' => 1,
+            'label' => 'East 1B',
+        ]);
+
+        $this->insert('cluster', [
+            'sector_id' => 6,
+            'label' => 'Los Banos',
+        ]);
+
+        $this->insert('cluster', [
+            'sector_id' => 6,
+            'label' => 'BayCal',
+        ]);
+
+        $this->insert('cluster', [
+            'sector_id' => 6,
+            'label' => 'C4',
+        ]);
     }
 
     public function down()

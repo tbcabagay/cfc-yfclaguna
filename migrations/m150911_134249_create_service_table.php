@@ -9,7 +9,19 @@ class m150911_134249_create_service_table extends Migration
     {
         $this->createTable('service', [
             'id' => $this->smallInteger() . ' AUTO_INCREMENT PRIMARY KEY',
-            'name' => $this->string(15)->notNull(),
+            'name' => $this->string(30)->notNull(),
+        ]);
+
+        $this->insert('service', [
+            'name' => 'Head',
+        ]);
+
+        $this->insert('service', [
+            'name' => 'Couple Coordinator',
+        ]);
+
+        $this->insert('service', [
+            'name' => 'Member',
         ]);
     }
 

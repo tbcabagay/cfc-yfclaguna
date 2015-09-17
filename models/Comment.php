@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "comment".
@@ -19,6 +20,17 @@ use Yii;
  */
 class Comment extends \yii\db\ActiveRecord
 {
+    const SCENARIO_CREATE = 'create';
+    const STATUS_ACTIVE = 1;
+    const STATUS_DELETE = 2;
+
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios[self::SCENARIO_CREATE] = ['content'];
+        return $scenarios;
+    }
+
     /**
      * @inheritdoc
      */
@@ -69,5 +81,20 @@ class Comment extends \yii\db\ActiveRecord
     public function getAnnouncement()
     {
         return $this->hasOne(Announcement::className(), ['id' => 'announcement_id']);
+    }
+
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if ($insert) {
+                $this->user_id = \Yii::$app->user->identity->id;
+                $this->status = self::STATUS_ACTIVE;
+                $this->created_at = new Expression('NOW()');
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }

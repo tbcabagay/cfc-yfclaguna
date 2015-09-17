@@ -3,13 +3,16 @@
 namespace app\models;
 
 use Yii;
+use app\models\Service;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "user".
  *
  * @property integer $id
  * @property string $auth_key
- * @property string $division
+ * @property integer $division_id
+ * @property string $division_label
  * @property integer $service_id
  * @property string $email
  * @property integer $status
@@ -32,10 +35,12 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
     const STATUS_ACTIVE = 1;
     const STATUS_DELETE = 0;
 
+    public $division;
+
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios[self::SCENARIO_REGISTER] = ['email', 'role'];
+        $scenarios[self::SCENARIO_REGISTER] = ['email', /*'role',*/ 'division_id', 'division_label', 'service_id'];
         return $scenarios;
     }
 
@@ -53,13 +58,14 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
     public function rules()
     {
         return [
-            [['auth_key', 'division', 'email', 'status', 'role', 'created_at'], 'required'],
-            [['service_id', 'status'], 'integer'],
+            [['auth_key', 'division_id', 'division_label', 'service_id', 'email', 'status', 'role', 'created_at'], 'required'],
+            [['division_id', 'service_id', 'status'], 'integer'],
             [['email'], 'email'],
             [['email'], 'unique'],
             [['created_at', 'updated_at'], 'safe'],
             [['auth_key'], 'string', 'max' => 32],
-            [['division', 'role'], 'string', 'max' => 15],
+            [['role'], 'string', 'max' => 15],
+            [['division_label'], 'string', 'max' => 20],
             [['email'], 'string', 'max' => 255]
         ];
     }
@@ -72,7 +78,8 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
         return [
             'id' => 'ID',
             'auth_key' => 'Auth Key',
-            'division' => 'Division',
+            'division_id' => 'Division ID',
+            'division_label' => 'Division Label',
             'service_id' => 'Service ID',
             'email' => 'Email',
             'status' => 'Status',
@@ -143,7 +150,7 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
      */
     public function getUserProfiles()
     {
-        return $this->hasMany(UserProfile::className(), ['user_id' => 'id']);
+        return $this->hasOne(UserProfile::className(), ['user_id' => 'id']);
     }
 
     /**
@@ -235,5 +242,57 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
         }
 
         return false;
+    }
+
+    public function getServiceList()
+    {
+        $model = Service::find()->orderBy('name ASC')->all();
+        return ArrayHelper::map($model, 'id', 'name');        
+    }
+
+    public function getDivisionList()
+    {
+        $model = [
+            'provincial' => 'Provincial',
+            'sector' => 'Sector',
+            'cluster' => 'Cluster',
+            'chapter' => 'Chapter',
+        ];
+
+        return $model;
+    }
+
+    public static function findByEmail($email)
+    {
+        return static::find()
+            ->where(['email' => $email])
+            ->limit(1)
+            ->one();
+    }
+
+    public function afterFind()
+    {
+        $this->division = $this->findDivision($this->division_id, $this->division_label);
+
+        return parent::afterFind();
+    }
+
+    protected function findDivision($id, $label)
+    {
+        $model = null;
+
+        if ($label == 'provincial') {
+            $model = Provincial::findOne($id);
+        } else if ($label == 'sector') {
+            $model = Sector::findOne($id);
+        } else if ($label == 'cluster') {
+            $model = Cluster::findOne($id);
+        } else if ($label == 'chapter') {
+            $model = Chapter::findOne($id);
+        }
+
+        if ($model !== null) {
+            return $model->label;
+        }
     }
 }

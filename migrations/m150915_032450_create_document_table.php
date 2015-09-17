@@ -15,7 +15,7 @@ class m150915_032450_create_document_table extends Migration
             'attachment' => $this->string(500)->notNull(),
             'status' => $this->smallInteger()->notNull(),
             'is_deleted' => $this->boolean()->notNull(),
-            'created_at' => $this->timestamp()->notNull(),
+            'created_at' => $this->dateTime()->notNull(),
             'time_difference' => $this->integer(),
         ]);
 

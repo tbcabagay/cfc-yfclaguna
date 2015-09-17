@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use app\models\Sector;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "cluster".
@@ -71,5 +73,17 @@ class Cluster extends \yii\db\ActiveRecord
     public function getMembers()
     {
         return $this->hasMany(Member::className(), ['cluster_id' => 'id']);
+    }
+
+    /*public function getSectorList()
+    {
+        $model = Sector::find()->orderBy('label ASC')->all();
+        return ArrayHelper::map($model, 'id', 'label');
+    }*/
+
+    public function getList()
+    {
+        $model = self::find()->orderBy('label ASC')->all();
+        return ArrayHelper::map($model, 'id', 'label');
     }
 }

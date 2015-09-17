@@ -10,15 +10,17 @@ class m150915_032510_create_document_status_table extends Migration
         $this->createTable('document_status', [
             'id' => $this->bigInteger() . ' AUTO_INCREMENT PRIMARY KEY',
             'document_id' => $this->integer()->notNull(),
-            'division_id' => $this->integer()->notNull(),
-            'division_label' => $this->string(15)->notNull(),
-            'remarks' => $this->string(500)->notNull(),
+            'from_id' => $this->integer()->notNull(),
+            'from_label' => $this->string(20)->notNull(),
+            'to_id' => $this->integer()->notNull(),
+            'to_label' => $this->string(20)->notNull(),
+            'remarks' => $this->string(500),
             'received_by' => $this->integer(),
-            'received_at' => $this->timestamp(),
+            'received_at' => $this->dateTime(),
             'released_by' => $this->integer(),
-            'released_at' => $this->timestamp(),
+            'released_at' => $this->dateTime(),
             'action' => $this->smallInteger(),
-            'attachment' => $this->string(500)->notNull(),
+            'attachment' => $this->string(500),
             'time_difference' => $this->integer(),
         ]);
 

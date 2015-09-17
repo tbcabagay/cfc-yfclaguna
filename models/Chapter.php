@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use app\models\Cluster;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "chapter".
@@ -53,5 +55,11 @@ class Chapter extends \yii\db\ActiveRecord
     public function getCluster()
     {
         return $this->hasOne(Cluster::className(), ['id' => 'cluster_id']);
+    }
+
+    public function getClusterList()
+    {
+        $model = Cluster::find()->orderBy('label ASC')->all();
+        return ArrayHelper::map($model, 'id', 'label');
     }
 }

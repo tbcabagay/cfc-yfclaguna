@@ -14,6 +14,31 @@ class m150914_072146_create_chapter_table extends Migration
         ]);
 
         $this->addForeignKey('fk_cluster_chapter', 'chapter', 'cluster_id', 'cluster', 'id', 'CASCADE', 'CASCADE');
+
+        $this->insert('chapter', [
+            'cluster_id' => 2,
+            'label' => 'San Antonio',
+        ]);
+
+        $this->insert('chapter', [
+            'cluster_id' => 2,
+            'label' => 'St. Therese - UPLB',
+        ]);
+
+        $this->insert('chapter', [
+            'cluster_id' => 2,
+            'label' => 'Immaculate Concepcion',
+        ]);
+
+        $this->insert('chapter', [
+            'cluster_id' => 4,
+            'label' => 'Cathedral-Concepcion',
+        ]);
+
+        $this->insert('chapter', [
+            'cluster_id' => 4,
+            'label' => 'Calihan-San Gabriel',
+        ]);
     }
 
     public function down()

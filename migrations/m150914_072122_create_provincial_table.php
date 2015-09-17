@@ -11,6 +11,10 @@ class m150914_072122_create_provincial_table extends Migration
             'id' => $this->primaryKey(),
             'label' => $this->string(30)->notNull(),
         ]);
+
+        $this->insert('provincial', [
+            'label' => 'Laguna',
+        ]);
     }
 
     public function down()

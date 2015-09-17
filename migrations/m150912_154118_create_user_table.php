@@ -10,8 +10,9 @@ class m150912_154118_create_user_table extends Migration
         $this->createTable('user', [
             'id' => $this->primaryKey(),
             'auth_key' => $this->string(32)->notNull(),
-            'division' => $this->string(15)->notNull(),
-            'service_id' => $this->smallInteger(),
+            'division_id' => $this->integer()->notNull(),
+            'division_label' => $this->string(20)->notNull(),
+            'service_id' => $this->smallInteger()->notNull(),
             'email' => $this->string(255)->notNull(),
             'status' => $this->smallInteger()->notNull(),
             'role' => $this->string(15)->notNull(),

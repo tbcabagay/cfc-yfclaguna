@@ -5,9 +5,8 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\Provincial */
 
-$this->title = 'Update Provincial: ' . ' ' . $model->id;
+$this->title = 'Update Provincial';
 $this->params['breadcrumbs'][] = ['label' => 'Provincials', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
 <div class="provincial-update">

@@ -14,7 +14,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'auth_key')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'division')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'division_id')->textInput() ?>
+
+    <?= $form->field($model, 'division_label')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'service_id')->textInput() ?>
 

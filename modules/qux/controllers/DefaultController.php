@@ -3,11 +3,17 @@
 namespace app\modules\qux\controllers;
 
 use yii\web\Controller;
+use app\models\AnnouncementSearch;
 
 class DefaultController extends Controller
 {
     public function actionIndex()
     {
-        return $this->render('index');
+        $searchModel = new AnnouncementSearch();
+        $dataProvider = $searchModel->latest();
+
+        return $this->render('index', [
+            'dataProvider' => $dataProvider,
+        ]);
     }
 }

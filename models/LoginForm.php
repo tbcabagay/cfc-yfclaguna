@@ -1,5 +1,4 @@
 <?php
-
 namespace app\models;
 
 use Yii;
@@ -44,9 +43,13 @@ class LoginForm extends Model
         if (!$this->hasErrors()) {
             $user = $this->getUser();
 
-            if (!$user || !$user->validatePassword($this->password)) {
+            /*if (!$user || !$user->validatePassword($this->password)) {
                 $this->addError($attribute, 'Incorrect username or password.');
-            }
+            }*/
+            if (!$user) {
+                $this->addError($attribute, 'Incorrect username.');
+            } else if (!$user->validatePassword($this->password))
+                $this->addError($attribute, 'Incorrect password.');
         }
     }
 
@@ -70,7 +73,7 @@ class LoginForm extends Model
     public function getUser()
     {
         if ($this->_user === false) {
-            $this->_user = User::findByUsername($this->username);
+            $this->_user = Member::findByUsername($this->username);
         }
 
         return $this->_user;

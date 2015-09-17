@@ -14,6 +14,46 @@ class m150914_072130_create_sector_table extends Migration
         ]);
 
         $this->addForeignKey('fk_provincial_sector', 'sector', 'provincial_id', 'provincial', 'id', 'CASCADE', 'CASCADE');
+
+        $this->insert('sector', [
+            'provincial_id' => 1,
+            'label' => 'East 1',
+        ]);
+
+        $this->insert('sector', [
+            'provincial_id' => 1,
+            'label' => 'East 2',
+        ]);
+
+        $this->insert('sector', [
+            'provincial_id' => 1,
+            'label' => 'East 3',
+        ]);
+
+        $this->insert('sector', [
+            'provincial_id' => 1,
+            'label' => 'East 4',
+        ]);
+
+        $this->insert('sector', [
+            'provincial_id' => 1,
+            'label' => 'Central 1',
+        ]);
+
+        $this->insert('sector', [
+            'provincial_id' => 1,
+            'label' => 'Central 2',
+        ]);
+
+        $this->insert('sector', [
+            'provincial_id' => 1,
+            'label' => 'West 1',
+        ]);
+
+        $this->insert('sector', [
+            'provincial_id' => 1,
+            'label' => 'West 2',
+        ]);
     }
 
     public function down()

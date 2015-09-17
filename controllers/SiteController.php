@@ -8,6 +8,13 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\models\Auth;
 use app\models\User;
+use app\models\Member;
+use app\models\Service;
+use app\models\Cluster;
+use app\models\UserProfile;
+use yii\web\BadRequestHttpException;
+use yii\web\UploadedFile;
+use app\models\LoginForm;
 
 class SiteController extends Controller
 {
@@ -56,6 +63,30 @@ class SiteController extends Controller
         return $this->render('index');
     }
 
+    public function actionRegister()
+    {
+        $member = new Member();
+        $service = new Service();
+        $cluster = new Cluster();
+
+        $member->scenario = Member::SCENARIO_REGISTER;
+
+        if ($member->load(Yii::$app->request->post())) {
+            $member->image_file = UploadedFile::getInstance($member, 'image_file');
+
+            if ($member->save()) {
+                \Yii::$app->session->setFlash('contact-success', 'Thank you! Your information has been saved.');
+                return $this->redirect(['register']);
+            }
+        }
+
+        return $this->render('register', [
+            'member' => $member,
+            'service' => $service,
+            'cluster' => $cluster,
+        ]);
+    }
+
     public function actionLogin()
     {
         if (!\Yii::$app->user->isGuest) {
@@ -64,7 +95,7 @@ class SiteController extends Controller
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
+            return $this->redirect(['/qux/default/index']);
         }
         return $this->render('login', [
             'model' => $model,
@@ -82,55 +113,46 @@ class SiteController extends Controller
     {
         $attributes = $client->getUserAttributes();
 
-        $auth = Auth::find()->where([
-            'source' => $client->getId(),
-            'source_id' => $attributes['id'],
-        ])->one();
+        $login = User::findByEmail($attributes['emails'][0]['value']);
 
         if (Yii::$app->user->isGuest) {
-            if ($auth) { // login
-                $user = $auth->user;
-                Yii::$app->user->login($user);
-            } else { // signup
-                if (isset($attributes['email']) && User::find()->where(['email' => $attributes['email']])->exists()) {
-                    Yii::$app->getSession()->setFlash('error', [
-                        Yii::t('app', "User with the same email as in {client} account already exists but isn't linked to it. Login using email first to link it.", ['client' => $client->getTitle()]),
-                    ]);
-                } else {
-                    $password = Yii::$app->security->generateRandomString(6);
-                    $user = new User([
-                        'username' => $attributes['login'],
-                        'email' => $attributes['email'],
-                        'password' => $password,
-                    ]);
-                    $user->generateAuthKey();
-                    $user->generatePasswordResetToken();
-                    $transaction = $user->getDb()->beginTransaction();
-                    if ($user->save()) {
-                        $auth = new Auth([
-                            'user_id' => $user->id,
-                            'source' => $client->getId(),
-                            'source_id' => (string)$attributes['id'],
-                        ]);
-                        if ($auth->save()) {
-                            $transaction->commit();
-                            Yii::$app->user->login($user);
-                        } else {
-                            print_r($auth->getErrors());
-                        }
-                    } else {
-                        print_r($user->getErrors());
-                    }
+            if(is_null($login))
+                throw new BadRequestHttpException('User account is not registered.');
+            else {
+                $userProfile = UserProfile::find()
+                    ->where(['user_id' => $login->id])
+                    ->limit(1)
+                    ->one();
+
+                $auth = Auth::find()
+                    ->where(['source' => $client->getId()])
+                    ->andWhere(['source_id' => $attributes['id']])
+                    ->limit(1)
+                    ->one();
+
+                if ($auth === null) {
+                    $modelAuth = new Auth();
+                    $modelAuth->user_id = $login->id;
+                    $modelAuth->source = $client->getId();
+                    $modelAuth->source_id = $attributes['id'];
+                    $modelAuth->save();
                 }
-            }
-        } else { // user already logged in
-            if (!$auth) { // add auth provider
-                $auth = new Auth([
-                    'user_id' => Yii::$app->user->id,
-                    'source' => $client->getId(),
-                    'source_id' => $attributes['id'],
-                ]);
-                $auth->save();
+
+                Yii::$app->user->login($login);
+
+                if ($userProfile === null) {
+                    $modelUserprofile = new UserProfile();
+                    $modelUserprofile->user_id = $login->id;
+                    $modelUserprofile->family_name = $attributes['name']['familyName'];
+                    $modelUserprofile->given_name = $attributes['name']['givenName'];
+                    $modelUserprofile->image = $attributes['image']['url'];
+                    $modelUserprofile->save();
+                }
+
+                \Yii::$app->session->set('userProfile.url', ($userProfile === null) ? $modelUserprofile->image : $userProfile->image);
+                \Yii::$app->session->set('userProfile.name', ($userProfile === null) ? $modelUserprofile->given_name : $userProfile->given_name);
+
+                return $this->redirect(['qux/default/index']);
             }
         }
     }

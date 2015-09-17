@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "service".
@@ -30,7 +31,7 @@ class Service extends \yii\db\ActiveRecord
     {
         return [
             [['name'], 'required'],
-            [['name'], 'string', 'max' => 15]
+            [['name'], 'string', 'max' => 30]
         ];
     }
 
@@ -59,5 +60,11 @@ class Service extends \yii\db\ActiveRecord
     public function getUsers()
     {
         return $this->hasMany(User::className(), ['service_id' => 'id']);
+    }
+
+    public function getList()
+    {
+        $model = self::find()->orderBy('name ASC')->all();
+        return ArrayHelper::map($model, 'id', 'name');
     }
 }

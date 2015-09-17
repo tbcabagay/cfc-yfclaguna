@@ -17,6 +17,7 @@ $config = [
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
+            'loginUrl' => ['/site/index'],
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
@@ -45,7 +46,7 @@ $config = [
                     'class' => 'yii\authclient\clients\GoogleOAuth',
                     'clientId' => '1033242369377-fmp3ths9tj1kd4bjh8qkjvq76jsf27f4.apps.googleusercontent.com',
                     'clientSecret' => 'zgOh_GQpPEfhKbm8dpRk9Sv3',
-                    'returnUrl' => 'http://cfc-yfclaguna.org/site/auth.html?authclient=google',
+                    'returnUrl' => 'http://cfc-yfclaguna.org/site/auth?authclient=google',
                 ],
             ],
         ],
@@ -63,6 +64,10 @@ $config = [
         ],
     ],
     'modules' => [
+        'markdown' => [
+            'class' => 'kartik\markdown\Module',
+            'smartyPants' => false,
+        ],
         'qux' => [
             'class' => 'app\modules\qux\Module',
             'layoutPath' => '@app/modules/qux/views/layouts',

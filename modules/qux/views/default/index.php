@@ -1,12 +1,21 @@
-<div class="qux-default-index">
-    <h1><?= $this->context->action->uniqueId ?></h1>
-    <p>
-        This is the view content for action "<?= $this->context->action->id ?>".
-        The action belongs to the controller "<?= get_class($this->context) ?>"
-        in the "<?= $this->context->module->id ?>" module.
-    </p>
-    <p>
-        You may customize this page by editing the following file:<br>
-        <code><?= __FILE__ ?></code>
-    </p>
+<?php
+
+/* @var $this yii\web\View */
+
+use yii\helpers\Html;
+use yii\widgets\ListView;
+
+$this->title = 'Welcome';
+$this->params['breadcrumbs'][] = $this->title;
+?>
+
+<div class="admin-default-index">
+    <div class="page-header">
+        <h1>Latest News</h1>
+    </div>
+
+    <?= ListView::widget([
+        'dataProvider' => $dataProvider,
+        'itemView' => '_news',
+    ]); ?>
 </div>
