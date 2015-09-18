@@ -50,6 +50,7 @@ class Member extends \yii\db\ActiveRecord
             'service_id', 'cluster_id', 'username', 'password', 'confirm_password',
             'family_name', 'given_name', 'address', 'email', 'birthday', 'captcha',
         ];
+
         return $scenarios;
     }
 
@@ -171,6 +172,17 @@ class Member extends \yii\db\ActiveRecord
     public function validateAuthKey($authKey)
     {
         return $this->getAuthKey() === $authKey;
+    }
+
+    public static function findByUsername($username)
+    {
+        foreach (self::$users as $user) {
+            if (strcasecmp($user['username'], $username) === 0) {
+                return new static($user);
+            }
+        }
+
+        return null;
     }
 
     public function beforeSave($insert)
