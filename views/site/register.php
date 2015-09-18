@@ -4,6 +4,7 @@ use yii\bootstrap\Alert;
 use yii\helpers\Html;
 use kartik\form\ActiveForm;
 use kartik\widgets\DatePicker;
+use yii\captcha\Captcha;
 
 $this->title = 'Registration';
 ?>
@@ -62,6 +63,8 @@ $this->title = 'Registration';
                         ],
                     ]); ?>
                 </fieldset>
+
+                <?= $form->field($member, 'captcha')->widget(Captcha::className()) ?>
 
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-md-9">

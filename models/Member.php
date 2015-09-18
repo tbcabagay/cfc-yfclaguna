@@ -40,6 +40,7 @@ class Member extends \yii\db\ActiveRecord
     public $image_path;
     public $confirm_password;
     public $password;
+    public $captcha;
 
     public function scenarios()
     {
@@ -47,7 +48,7 @@ class Member extends \yii\db\ActiveRecord
         $scenarios[self::SCENARIO_ADMIN_REGISTER] = ['username', 'password', 'service_id', 'cluster_id', 'family_name', 'given_name', 'address', 'email', 'birthday', 'joined_at', 'venue', 'image_file'];
         $scenarios[self::SCENARIO_REGISTER] = [
             'service_id', 'cluster_id', 'username', 'password', 'confirm_password',
-            'family_name', 'given_name', 'address', 'email', 'birthday',
+            'family_name', 'given_name', 'address', 'email', 'birthday', 'captcha',
         ];
         return $scenarios;
     }
@@ -66,9 +67,10 @@ class Member extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['auth_key', 'service_id', 'cluster_id', 'username', 'password', 'confirm_password', 'password_hash', 'family_name', 'given_name', 'address', 'email', 'birthday', 'status'], 'required'],
+            [['auth_key', 'service_id', 'cluster_id', 'username', 'password', 'confirm_password', 'password_hash', 'family_name', 'given_name', 'address', 'email', 'birthday', 'status', 'captcha'], 'required'],
             [['service_id', 'cluster_id', 'status'], 'integer'],
-            [['email'], 'email'],
+            ['email', 'email'],
+            ['captcha', 'captcha'],
             [['username', 'email'], 'unique'],
             [['confirm_password'], 'compare', 'compareAttribute' => 'password', 'message' => 'Passwords do not match'],
             [['birthday', 'joined_at'], 'safe'],
