@@ -77,7 +77,6 @@ class SiteController extends Controller
             $transaction = $user->getDb()->beginTransaction();
 
             if ($user->save()) {
-                var_dump('User ID ' . $user->id);
                 $userProfile->user_id = $user->id;
 
                 if ($userProfile->save()) {

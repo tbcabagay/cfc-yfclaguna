@@ -58,6 +58,7 @@ else
             ['label' => 'Users', 'items' => [
                 ['label' => 'Manage', 'url' => ['/qux/user/index']],
                 ['label' => 'Activate', 'url' => ['/qux/user-profile/activate']],
+                ['label' => 'Member Register', 'url' => ['/qux/user-profile/member-create']],
             ]],
             ['label' => 'Divisions', 'items' => [
                 ['label' => 'Provincial', 'url' => ['/qux/provincial/index']],

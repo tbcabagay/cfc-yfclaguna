@@ -5,6 +5,7 @@ namespace app\modules\qux\controllers;
 use Yii;
 use app\models\Cluster;
 use app\models\User;
+use app\models\Service;
 use app\models\UserProfile;
 use app\models\UserProfileSearch;
 use yii\web\Controller;
@@ -43,34 +44,67 @@ class UserProfileController extends Controller
     public function actionActivate()
     {
         $searchModel = new UserProfileSearch();
-        $cluster = new Cluster();
         $dataProvider = $searchModel->inactive();
 
         return $this->render('activate', [
             'dataProvider' => $dataProvider,
-            'cluster' => $cluster,
         ]);
     }
 
-    public function actionBulkActivate()
+    public function actionDoActivate($id)
     {
-        if (Yii::$app->request->isPost) {
-            $selections = \Yii::$app->request->post('selection');
-            $success = true;
+        $model = $this->findModel($id);
+        $model->scenario = UserProfile::SCENARIO_ACTIVATE;
 
-            foreach ($selections as $selection) {
-                $user = User::findOne($selection);
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->save()) {
+                $user = User::findOne($model->user_id);
                 $user->scenario = User::SCENARIO_ACTIVATE;
                 $user->status = User::STATUS_ACTIVE;
 
-                $success = $success && $user->save();
+                if ($user->save())
+                    return $this->redirect(['activate']);
             }
 
-            if ($success)
-                return $this->redirect(['activate']);
-            else
-                print_r($user->getErrors());
+        } else {
+            return $this->render('do-activate', [
+                'model' => $model,
+            ]);
         }
+    }
+
+    public function actionMemberCreate()
+    {
+        $user = new User();
+        $userProfile = new UserProfile();
+        $service = new Service();
+        $cluster = new Cluster();
+
+        $user->scenario = User::SCENARIO_MEMBER_CREATE;
+        $userProfile->scenario = User::SCENARIO_MEMBER_CREATE;
+
+        if ($user->load(Yii::$app->request->post()) && $userProfile->load(Yii::$app->request->post())) {
+            $user->role = 'member';
+            $transaction = $user->getDb()->beginTransaction();
+
+            if ($user->save()) {
+                $userProfile->user_id = $user->id;
+
+                if ($userProfile->save()) {
+                    $transaction->commit();
+
+                    \Yii::$app->session->setFlash('contact-success', 'Thank you! Your information has been saved.');
+                    return $this->redirect(['member-create']);
+                }
+            }
+        }
+
+        return $this->render('member-create', [
+            'user' => $user,
+            'userProfile' => $userProfile,
+            'service' => $service,
+            'cluster' => $cluster,
+        ]);
     }
 
     /**

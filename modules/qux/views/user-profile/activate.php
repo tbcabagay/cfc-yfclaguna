@@ -8,13 +8,10 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="document-status-index">
 
-    <?= Html::beginForm(['user-profile/bulk-activate'], 'post');?>
-
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
             'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
-                ['class' => 'yii\grid\CheckboxColumn'],
 
                 'family_name',
                 'given_name',
@@ -44,7 +41,23 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
                 [
                     'class' => 'yii\grid\ActionColumn',
-                    'template' => '{view}',
+                    'template' => '{view} {release}',
+                    'buttons' => [
+                        'view' => function($url, $model, $key) {
+                            return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['/qux/user-profile/view', 'id' => $model->user_id], [
+                                'title' => 'View',
+                                'aria-label' => 'View',
+                                'data-pjax' => 0,
+                            ]);
+                        },
+                        'release' => function($url, $model, $key) {
+                            return Html::a('<span class="glyphicon glyphicon-ok"></span>', ['/qux/user-profile/do-activate', 'id' => $model->user_id], [
+                                'title' => 'Activate',
+                                'aria-label' => 'Activate',
+                                'data-pjax' => 0,
+                            ]);
+                        },
+                    ],
                 ],
             ],
             'panel' => [
@@ -54,12 +67,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'condensed' => true,
             'hover' => true,
             'toolbar'=> [
-            [
-                'content' => Html::submitButton('<span class="glyphicon glyphicon-plus"></span> Activate', ['class' => 'btn btn-success', 'title' => 'Activate'])
+                [
+                    'content' => Html::submitButton('<span class="glyphicon glyphicon-plus"></span> Activate', ['class' => 'btn btn-success', 'title' => 'Activate'])
+                ],
             ],
-        ],
         ]); ?>
-
-    <?= Html::endForm();?>
 
 </div>

@@ -76,6 +76,8 @@ class Cluster extends \yii\db\ActiveRecord
     public static function getClusterType($id)
     {
         $model = static::findOne($id);
-        return $model->label;
+
+        if ($model !== null)
+            return $model->label;
     }
 }

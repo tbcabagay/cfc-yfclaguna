@@ -19,7 +19,7 @@ class UserProfileSearch extends UserProfile
     {
         return [
             [['id', 'user_id'], 'integer'],
-            [['family_name', 'given_name', 'image', 'address', 'birthday', 'joined_at', 'venue'], 'safe'],
+            [['family_name', 'given_name', 'image', 'contact_number', 'address', 'birthday', 'joined_at', 'venue'], 'safe'],
         ];
     }
 

@@ -56,6 +56,8 @@ $this->title = 'Registration';
 
                     <?= $form->field($userProfile, 'address')->textArea(['maxlength' => true]) ?>
 
+                    <?= $form->field($userProfile, 'contact_number')->textInput(['maxlength' => true]) ?>
+
                     <?= $form->field($userProfile, 'birthday')->widget(DatePicker::classname(), [
                         'pluginOptions' => [
                             'autoclose'=>true,
@@ -75,5 +77,5 @@ $this->title = 'Registration';
                 <?php ActiveForm::end(); ?>
             </div>
         </div>
-  </div>
+    </div>
 </section>

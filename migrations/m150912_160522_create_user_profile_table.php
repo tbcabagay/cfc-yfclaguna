@@ -13,6 +13,7 @@ class m150912_160522_create_user_profile_table extends Migration
             'family_name' => $this->string(100)->notNull(),
             'given_name' => $this->string(100)->notNull(),
             'image' => $this->string(300)->notNull(),
+            'contact_number' => $this->string(11),
             'address' => $this->string(300),
             'birthday' => $this->date(),
             'joined_at' => $this->date(),

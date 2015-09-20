@@ -36,6 +36,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     const SCENARIO_ADMIN_REGISTER = 'admin_register';
     const SCENARIO_GUEST_REGISTER = 'guest_register';
     const SCENARIO_ADMIN_USER_REGISTER = 'admin_user_register';
+    const SCENARIO_MEMBER_CREATE = 'member_create';
     const SCENARIO_ACTIVATE = 'activate';
     const STATUS_ACTIVE = 1;
     const STATUS_INACTIVE = 2;
@@ -54,6 +55,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         $scenarios = parent::scenarios();
 
         $scenarios[self::SCENARIO_GUEST_REGISTER] = ['service_id', 'cluster_id', 'username', 'password', 'confirm_password', 'email', 'captcha'];
+        $scenarios[self::SCENARIO_MEMBER_CREATE] = ['service_id', 'cluster_id', 'username', 'password', 'confirm_password', 'email'];
         $scenarios[self::SCENARIO_ADMIN_USER_REGISTER] = ['email', /*'role',*/ 'division_id', 'division_label', 'service_id'];
         $scenarios[self::SCENARIO_ACTIVATE] = ['status'];
 
@@ -272,7 +274,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     {
         if (parent::beforeSave($insert)) {
             if ($this->isNewRecord) {
-                if ($this->scenario == self::SCENARIO_ADMIN_REGISTER || $this->scenario == self::SCENARIO_ADMIN_USER_REGISTER)
+                if ($this->scenario == self::SCENARIO_ADMIN_REGISTER || $this->scenario == self::SCENARIO_ADMIN_USER_REGISTER || $this->scenario == self::SCENARIO_MEMBER_CREATE)
                     $this->status = self::STATUS_ACTIVE;
                 else if ($this->scenario == self::SCENARIO_GUEST_REGISTER)
                     $this->status = self::STATUS_INACTIVE;
