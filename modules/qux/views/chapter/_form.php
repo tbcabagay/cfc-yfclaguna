@@ -14,7 +14,7 @@ use kartik\form\ActiveForm;
         'type' => ActiveForm::TYPE_HORIZONTAL,
     ]); ?>
 
-    <?= $form->field($model, 'cluster_id')->dropDownList($model->getClusterList(), ['prompt' => 'Select...']) ?>
+    <?= $form->field($model, 'cluster_id')->dropDownList($cluster->getList(), ['prompt' => 'Select...']) ?>
 
     <?= $form->field($model, 'label')->textInput(['maxlength' => true]) ?>
 

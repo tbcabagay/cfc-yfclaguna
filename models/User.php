@@ -1,10 +1,9 @@
 <?php
 
 namespace app\models;
+use yii\helpers\ArrayHelper;
 
 use Yii;
-use app\models\Service;
-use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "user".
@@ -14,6 +13,9 @@ use yii\helpers\ArrayHelper;
  * @property integer $division_id
  * @property string $division_label
  * @property integer $service_id
+ * @property integer $cluster_id
+ * @property string $username
+ * @property string $password_hash
  * @property string $email
  * @property integer $status
  * @property string $role
@@ -29,18 +31,32 @@ use yii\helpers\ArrayHelper;
  * @property Service $service
  * @property UserProfile[] $userProfiles
  */
-class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
+class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
-    const SCENARIO_REGISTER = 'register';
+    const SCENARIO_ADMIN_REGISTER = 'admin_register';
+    const SCENARIO_GUEST_REGISTER = 'guest_register';
+    const SCENARIO_ADMIN_USER_REGISTER = 'admin_user_register';
+    const SCENARIO_ACTIVATE = 'activate';
     const STATUS_ACTIVE = 1;
-    const STATUS_DELETE = 0;
+    const STATUS_INACTIVE = 2;
+    const STATUS_DELETE = 3;
 
+    public $confirm_password;
+    public $password;
+    public $captcha;
+    public $full_name;
+    public $profile_image;
     public $division;
+    public $cluster;
 
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios[self::SCENARIO_REGISTER] = ['email', /*'role',*/ 'division_id', 'division_label', 'service_id'];
+
+        $scenarios[self::SCENARIO_GUEST_REGISTER] = ['service_id', 'cluster_id', 'username', 'password', 'confirm_password', 'email', 'captcha'];
+        $scenarios[self::SCENARIO_ADMIN_USER_REGISTER] = ['email', /*'role',*/ 'division_id', 'division_label', 'service_id'];
+        $scenarios[self::SCENARIO_ACTIVATE] = ['status'];
+
         return $scenarios;
     }
 
@@ -58,15 +74,19 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
     public function rules()
     {
         return [
-            [['auth_key', 'division_id', 'division_label', 'service_id', 'email', 'status', 'role', 'created_at'], 'required'],
-            [['division_id', 'service_id', 'status'], 'integer'],
-            [['email'], 'email'],
-            [['email'], 'unique'],
+            [['username', 'password', 'confirm_password', 'cluster_id' ,'auth_key', 'division_id', 'division_label', 'service_id', 'email', 'status', 'role', 'created_at'], 'required'],
+            [['division_id', 'service_id', 'cluster_id', 'status'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
+            [['username', 'email'], 'unique'],
+            ['email', 'email'],
+            ['captcha', 'captcha'],
+            [['confirm_password'], 'compare', 'compareAttribute' => 'password', 'message' => 'Passwords do not match'],
             [['auth_key'], 'string', 'max' => 32],
-            [['role'], 'string', 'max' => 15],
             [['division_label'], 'string', 'max' => 20],
-            [['email'], 'string', 'max' => 255]
+            [['username'], 'string', 'max' => 50],
+            [['password_hash'], 'string', 'max' => 100],
+            [['email'], 'string', 'max' => 255],
+            [['role'], 'string', 'max' => 15]
         ];
     }
 
@@ -78,9 +98,12 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
         return [
             'id' => 'ID',
             'auth_key' => 'Auth Key',
-            'division_id' => 'Division ID',
-            'division_label' => 'Division Label',
-            'service_id' => 'Service ID',
+            'division_id' => 'Division',
+            'division_label' => 'Division Area',
+            'service_id' => 'Service',
+            'cluster_id' => 'Area',
+            'username' => 'Username',
+            'password_hash' => 'Password Hash',
             'email' => 'Email',
             'status' => 'Status',
             'role' => 'Role',
@@ -150,7 +173,7 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
      */
     public function getUserProfiles()
     {
-        return $this->hasOne(UserProfile::className(), ['user_id' => 'id']);
+        return $this->hasMany(UserProfile::className(), ['user_id' => 'id']);
     }
 
     /**
@@ -200,16 +223,33 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
         return $this->getAuthKey() === $authKey;
     }
 
-    public function getRoleTypes()
+    public static function findByUsername($username)
     {
-        $items = ['' => 'Choose...'];
-        $roles = \Yii::$app->authManager->getRoles();
+        return static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]);
+    }
 
-        foreach ($roles as $role) {
-            $items[$role->name] = $role->name;
+    public static function findByEmail($email)
+    {
+        return static::findOne(['email' => $email, 'status' => self::STATUS_ACTIVE]);
+    }
+
+    public function validatePassword($password)
+    {
+        return Yii::$app->security->validatePassword($password, $this->password_hash);
+    }
+
+    public function afterFind()
+    {
+        $this->division = $this->findDivision($this->division_id, $this->division_label);
+        $this->cluster = Cluster::getClusterType($this->cluster_id);
+
+        $model = UserProfile::find()->where(['user_id' => $this->id])->limit(1)->one();
+
+        if ($model !== null) {
+            $this->full_name = $model->given_name . ' ' . $model->family_name;
+            $this->profile_image = $model->image;
         }
-
-        return $items;
+        return parent::afterFind();
     }
 
     public function getStatusTypes()
@@ -232,22 +272,20 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
     {
         if (parent::beforeSave($insert)) {
             if ($this->isNewRecord) {
-                $this->status = self::STATUS_ACTIVE;
+                if ($this->scenario == self::SCENARIO_ADMIN_REGISTER || $this->scenario == self::SCENARIO_ADMIN_USER_REGISTER)
+                    $this->status = self::STATUS_ACTIVE;
+                else if ($this->scenario == self::SCENARIO_GUEST_REGISTER)
+                    $this->status = self::STATUS_INACTIVE;
+
+                $this->password_hash = Yii::$app->security->generatePasswordHash($this->password);
+                $this->auth_key = Yii::$app->security->generateRandomString();
                 $this->created_at = new \yii\db\Expression('NOW()');
-                $this->auth_key = \Yii::$app->security->generateRandomString();
-                $this->role = 'admin';
             }
 
             return true;
         }
 
         return false;
-    }
-
-    public function getServiceList()
-    {
-        $model = Service::find()->orderBy('name ASC')->all();
-        return ArrayHelper::map($model, 'id', 'name');        
     }
 
     public function getDivisionList()
@@ -260,21 +298,6 @@ class User extends \yii\db\ActiveRecord  implements \yii\web\IdentityInterface
         ];
 
         return $model;
-    }
-
-    public static function findByEmail($email)
-    {
-        return static::find()
-            ->where(['email' => $email])
-            ->limit(1)
-            ->one();
-    }
-
-    public function afterFind()
-    {
-        $this->division = $this->findDivision($this->division_id, $this->division_label);
-
-        return parent::afterFind();
     }
 
     protected function findDivision($id, $label)

@@ -87,6 +87,10 @@ a.desc:after {
     margin: 0 0 15px 0;
 }
 
-.comment-section > .comment-content {
+.comment-section > .comment-content,
+.search-data {
     padding-left: 60px;
+}
+.search-box {
+    margin-bottom: 20px;
 }

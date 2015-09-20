@@ -30,7 +30,10 @@
         "kartik-v/yii2-markdown": "dev-master",
         "kartik-v/yii2-icons": "@dev",
         "kartik-v/yii2-widgets": "*",
-        "2amigos/yii2-gallery-widget": "~1.0"
+        "2amigos/yii2-gallery-widget": "~1.0",
+        "sintret/yii2-chat-adminlte": "dev-master",
+        "kartik-v/yii2-widget-typeahead": "*",
+        "kartik-v/yii2-detail-view": "*"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",

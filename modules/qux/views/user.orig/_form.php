@@ -14,13 +14,17 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'auth_key')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'division_id')->textInput() ?>
+
+    <?= $form->field($model, 'division_label')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'service_id')->textInput() ?>
+
     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'status')->textInput() ?>
 
-    <?= $form->field($model, 'role')->textInput() ?>
-
-    <?= $form->field($model, 'is_deleted')->textInput() ?>
+    <?= $form->field($model, 'role')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'created_at')->textInput() ?>
 

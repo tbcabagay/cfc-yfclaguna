@@ -24,7 +24,7 @@ $this->title = 'Registration';
         ]); ?>    
         <?php endif; ?>
 
-        <div class="member-form">
+        <div class="user-form">
             <div class="col-md-10">
                 <?php $form = ActiveForm::begin([
                     'type' => ActiveForm::TYPE_HORIZONTAL,
@@ -34,29 +34,29 @@ $this->title = 'Registration';
                 <fieldset>
                     <legend>Account Information</legend>
 
-                    <?= $form->field($member, 'username')->textInput(['maxlength' => true]) ?>
+                    <?= $form->field($user, 'username')->textInput(['maxlength' => true]) ?>
 
-                    <?= $form->field($member, 'password')->passwordInput(['maxlength' => true]) ?>
+                    <?= $form->field($user, 'password')->passwordInput(['maxlength' => true]) ?>
 
-                    <?= $form->field($member, 'confirm_password')->passwordInput(['maxlength' => true]) ?>
+                    <?= $form->field($user, 'confirm_password')->passwordInput(['maxlength' => true]) ?>
 
-                    <?= $form->field($member, 'service_id')->dropDownList($service->getList(), ['prompt' => 'Select...']) ?>
+                    <?= $form->field($user, 'email')->textInput(['maxlength' => true]) ?>
 
-                    <?= $form->field($member, 'cluster_id')->dropDownList($cluster->getList(), ['prompt' => 'Select...']) ?>
+                    <?= $form->field($user, 'service_id')->dropDownList($service->getList(), ['prompt' => 'Select...']) ?>
+
+                    <?= $form->field($user, 'cluster_id')->dropDownList($cluster->getList(), ['prompt' => 'Select...']) ?>
                 </fieldset>
 
                 <fieldset>
                     <legend>Personal Information</legend>
 
-                    <?= $form->field($member, 'family_name')->textInput(['maxlength' => true]) ?>
+                    <?= $form->field($userProfile, 'family_name')->textInput(['maxlength' => true]) ?>
 
-                    <?= $form->field($member, 'given_name')->textInput(['maxlength' => true]) ?>
+                    <?= $form->field($userProfile, 'given_name')->textInput(['maxlength' => true]) ?>
 
-                    <?= $form->field($member, 'address')->textArea(['maxlength' => true]) ?>
+                    <?= $form->field($userProfile, 'address')->textArea(['maxlength' => true]) ?>
 
-                    <?= $form->field($member, 'email')->textInput(['maxlength' => true]) ?>
-
-                    <?= $form->field($member, 'birthday')->widget(DatePicker::classname(), [
+                    <?= $form->field($userProfile, 'birthday')->widget(DatePicker::classname(), [
                         'pluginOptions' => [
                             'autoclose'=>true,
                             'format' => 'yyyy-mm-dd',
@@ -64,7 +64,7 @@ $this->title = 'Registration';
                     ]); ?>
                 </fieldset>
 
-                <?= $form->field($member, 'captcha')->widget(Captcha::className()) ?>
+                <?= $form->field($user, 'captcha')->widget(Captcha::className()) ?>
 
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-md-9">

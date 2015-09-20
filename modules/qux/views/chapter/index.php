@@ -21,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'cluster_id',
                 'value' => 'cluster.label',
-                'filter' => Html::activeDropDownList($searchModel, 'cluster_id', $searchModel->getClusterList(), ['class'=>'form-control','prompt' => '']),
+                'filter' => Html::activeDropDownList($searchModel, 'cluster_id', $cluster->getList(), ['class'=>'form-control','prompt' => '']),
             ],
             'label',
 

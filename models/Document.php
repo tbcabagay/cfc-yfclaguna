@@ -25,6 +25,7 @@ use yii\helpers\BaseFileHelper;
 class Document extends \yii\db\ActiveRecord
 {
     const SCENARIO_CREATE = 'create';
+    const SCENARIO_UPDATE = 'update';
     const FILE_NEW = 1;
     const FILE_RECEIVE = 2;
     const FILE_RELEASE = 3;
@@ -39,6 +40,7 @@ class Document extends \yii\db\ActiveRecord
     {
         $scenarios = parent::scenarios();
         $scenarios[self::SCENARIO_CREATE] = ['title', 'remarks', 'attachment_file'];
+        $scenarios[self::SCENARIO_UPDATE] = ['title', 'remarks', 'attachment_file'];
         return $scenarios;
     }
 
@@ -103,11 +105,8 @@ class Document extends \yii\db\ActiveRecord
     public function beforeSave($insert)
     {
         if (parent::beforeSave($insert)) {
-            if ($insert) {
+            if ($this->isNewRecord) {
                 $this->user_id = \Yii::$app->user->identity->id;
-                $this->attachment_path = \Yii::getAlias('@app') . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'document' . DIRECTORY_SEPARATOR . \Yii::$app->user->identity->id . DIRECTORY_SEPARATOR . time();
-                $this->attachment = $this->attachment_path . DIRECTORY_SEPARATOR . $this->attachment_file->baseName . '.' . $this->attachment_file->extension;
-
                 /*if (\Yii::$app->user->identity->role == 'subadmin')
                     $this->status = self::FILE_PENDING;
                 else*/
@@ -115,6 +114,11 @@ class Document extends \yii\db\ActiveRecord
                 $this->status = self::FILE_NEW;
                 $this->is_deleted = false;
                 $this->created_at = new Expression('NOW()');
+            }
+
+            if ($this->attachment_file !== null) {
+                $this->attachment_path = \Yii::getAlias('@app') . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'document' . DIRECTORY_SEPARATOR . \Yii::$app->user->identity->id . DIRECTORY_SEPARATOR . time();
+                $this->attachment = $this->attachment_path . DIRECTORY_SEPARATOR . $this->attachment_file->baseName . '.' . $this->attachment_file->extension;
             }
 
             return true;
@@ -125,16 +129,19 @@ class Document extends \yii\db\ActiveRecord
 
     public function upload()
     {
-        //if ($this->validate()) {
-            $createPath = BaseFileHelper::createDirectory($this->attachment_path, 0754);
+        if ($this->validate()) {
+            if ($this->attachment_file !== null) {
+                if (!file_exists($this->attachment_path))
+                    $createPath = BaseFileHelper::createDirectory($this->attachment_path, 0754);
 
-            if ($createPath) {
-                $this->attachment_file->saveAs($this->attachment);
-                return true;
+                if ($createPath)
+                    $this->attachment_file->saveAs($this->attachment);
             }
 
-            return false;
-        //}
+            return true;
+        }
+
+        return false;
     }
 
     public function findToDivision()
@@ -198,4 +205,19 @@ class Document extends \yii\db\ActiveRecord
             return '<span class="label label-default">IN TRANSITION</span>';
         }
     }
+
+    /*public function deleteFile()
+    {
+        if (empty($this->attachment) || !file_exists($this->attachment))
+            return false;
+
+        if (is_file($this->attachment) && !unlink($this->attachment))
+            return false;
+
+        $uploadDir = \Yii::getAlias('@app') . '/uploads/create/' . $this->id;
+        if (is_dir($uploadDir) && !rmdir($uploadDir))
+            return false;
+
+        return true;
+    }*/
 }

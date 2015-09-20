@@ -8,6 +8,7 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\modules\qux\assets\QuxAsset;
+use kartik\widgets\TypeaheadBasic;
 
 QuxAsset::register($this);
 ?>
@@ -23,11 +24,21 @@ QuxAsset::register($this);
 </head>
 <body>
 <?php $this->beginBody() ?>
+<?php
+$data = [];
+$given_name = \yii\helpers\ArrayHelper::getColumn(\app\models\UserProfile::find()->select('given_name')->all(), 'given_name');
+$family_name = \yii\helpers\ArrayHelper::getColumn(\app\models\UserProfile::find()->select('family_name')->all(), 'family_name');
+
+if (!empty($given_name) || !empty($family_name))
+    $data = array_merge($given_name, $family_name);
+else
+    $data = ['No Data'];
+?>
 
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => 'My Company',
+        'brandLabel' => Yii::$app->params['appName'],
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
@@ -44,7 +55,10 @@ QuxAsset::register($this);
                 ['label' => 'Receive', 'url' => ['/qux/document-status/receive']],
                 ['label' => 'Release', 'url' => ['/qux/document-status/release']],
             ]],
-            ['label' => 'Users', 'url' => ['/qux/user/index']],
+            ['label' => 'Users', 'items' => [
+                ['label' => 'Manage', 'url' => ['/qux/user/index']],
+                ['label' => 'Activate', 'url' => ['/qux/user-profile/activate']],
+            ]],
             ['label' => 'Divisions', 'items' => [
                 ['label' => 'Provincial', 'url' => ['/qux/provincial/index']],
                 ['label' => 'Sector', 'url' => ['/qux/sector/index']],
@@ -52,7 +66,7 @@ QuxAsset::register($this);
                 ['label' => 'Chapter', 'url' => ['/qux/chapter/index']],
             ]],
             ['label' => 'Services', 'url' => ['/qux/service/index']],
-            ['label' => Html::img(\Yii::$app->session->get('userProfile.url'), ['alt' => 'profile picture', 'style' => 'width: 20px; height: 20px; margin-right: 8px;']) . \Yii::$app->session->get('userProfile.name'), 'items' => [
+            ['label' => Html::img(\Yii::$app->session->get('userProfile.url'), ['alt' => 'profile picture', 'height' => 20, 'style' => 'margin-right: 8px;']) . \Yii::$app->session->get('userProfile.name'), 'items' => [
                     [
                         'label' => 'Profile',
                         //'url' => ['/qux/user/profile', 'id' => \Yii::$app->user->identity->id],
@@ -74,13 +88,30 @@ QuxAsset::register($this);
         <?= Breadcrumbs::widget([
             'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
         ]) ?>
+
+        <div class="search-box">
+            <?= Html::beginForm(['/qux/default/search'], 'get') ?>
+            <div class="input-group">
+                <?= TypeaheadBasic::widget([
+                    'name' => 'search',
+                    'data' =>  $data,
+                    'options' => ['placeholder' => 'Search for members'],
+                    'pluginOptions' => ['highlight' => true],
+                ]); ?>
+                <span class="input-group-btn" title="Submit">
+                    <?= Html::submitButton('<i class="glyphicon glyphicon-search"></i>', ['class' => 'btn btn-primary']) ?>
+                </span>
+            </div>
+            <?= Html::endForm() ?>
+        </div>
+
         <?= $content ?>
     </div>
 </div>
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
+        <p class="pull-left">&copy; <?= Yii::$app->params['appName'] . ' ' . date('Y') ?></p>
 
         <p class="pull-right"><?= Yii::powered() ?></p>
     </div>

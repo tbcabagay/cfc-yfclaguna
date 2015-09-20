@@ -18,8 +18,8 @@ class UserSearch extends User
     public function rules()
     {
         return [
-            [['id', 'division_id', 'service_id', 'status'], 'integer'],
-            [['auth_key', 'division_label', 'email', 'role', 'created_at', 'updated_at'], 'safe'],
+            [['id', 'division_id', 'service_id', 'cluster_id', 'status'], 'integer'],
+            [['auth_key', 'division_label', 'username', 'password_hash', 'email', 'role', 'created_at', 'updated_at'], 'safe'],
         ];
     }
 
@@ -41,7 +41,7 @@ class UserSearch extends User
      */
     public function search($params)
     {
-        $query = User::find()->joinWith(['service']);
+        $query = User::find();
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -59,11 +59,14 @@ class UserSearch extends User
             'id' => $this->id,
             'division_id' => $this->division_id,
             'service_id' => $this->service_id,
+            'cluster_id' => $this->cluster_id,
             'status' => $this->status,
         ]);
 
         $query->andFilterWhere(['like', 'auth_key', $this->auth_key])
             ->andFilterWhere(['like', 'division_label', $this->division_label])
+            ->andFilterWhere(['like', 'username', $this->username])
+            ->andFilterWhere(['like', 'password_hash', $this->password_hash])
             ->andFilterWhere(['like', 'email', $this->email])
             ->andFilterWhere(['like', 'created_at', $this->created_at])
             ->andFilterWhere(['like', 'updated_at', $this->updated_at])

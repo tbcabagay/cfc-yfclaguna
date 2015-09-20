@@ -21,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'user',
                 'value' => function($model, $key, $index, $column) {
-                    return $model->user->userProfiles->getFullName();
+                    return $model->user->full_name;
                 },
             ],
             'title',

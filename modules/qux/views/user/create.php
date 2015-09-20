@@ -39,7 +39,7 @@ $this->registerJs("
 
         <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
 
-        <?= $form->field($model, 'service_id')->dropDownList($model->getServiceList(), ['prompt' => 'Select...']) ?>
+        <?= $form->field($model, 'service_id')->dropDownList($service->getList(), ['prompt' => 'Select...']) ?>
 
         <?= $form->field($model, 'division_label')->dropDownList($model->getDivisionList(), ['prompt' => 'Select...']) ?>
 
@@ -50,7 +50,7 @@ $this->registerJs("
 */ ?>
         <div class="form-group">
             <div class="col-sm-offset-2 col-md-9">
-                <?= Html::submitButton('Register', ['class' => 'btn btn-success']) ?>
+                <?= Html::submitButton('Create', ['class' => 'btn btn-success']) ?>
             </div>
         </div>
 

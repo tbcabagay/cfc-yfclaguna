@@ -8,6 +8,7 @@ use app\models\SectorSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use app\models\Provincial;
 
 /**
  * SectorController implements the CRUD actions for Sector model.
@@ -33,11 +34,13 @@ class SectorController extends Controller
     public function actionIndex()
     {
         $searchModel = new SectorSearch();
+        $provincial = new Provincial();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'provincial' => $provincial,
         ]);
     }
 
@@ -49,12 +52,14 @@ class SectorController extends Controller
     public function actionCreate()
     {
         $model = new Sector();
+        $provincial = new Provincial();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index']);
         } else {
             return $this->render('create', [
                 'model' => $model,
+                'provincial' => $provincial,
             ]);
         }
     }

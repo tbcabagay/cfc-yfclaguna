@@ -13,6 +13,10 @@ class m150912_160522_create_user_profile_table extends Migration
             'family_name' => $this->string(100)->notNull(),
             'given_name' => $this->string(100)->notNull(),
             'image' => $this->string(300)->notNull(),
+            'address' => $this->string(300),
+            'birthday' => $this->date(),
+            'joined_at' => $this->date(),
+            'venue' => $this->string(200),
         ]);
 
         $this->addForeignKey('fk_user_userprofile', 'user_profile', 'user_id', 'user', 'id', 'CASCADE', 'CASCADE');

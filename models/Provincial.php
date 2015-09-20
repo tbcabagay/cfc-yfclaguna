@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "provincial".
@@ -50,5 +51,11 @@ class Provincial extends \yii\db\ActiveRecord
     public function getSectors()
     {
         return $this->hasMany(Sector::className(), ['provincial_id' => 'id']);
+    }
+
+    public function getList()
+    {
+        $model = self::find()->orderBy('label ASC')->all();
+        return ArrayHelper::map($model, 'id', 'label');
     }
 }

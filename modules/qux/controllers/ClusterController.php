@@ -8,6 +8,7 @@ use app\models\ClusterSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use app\models\Sector;
 
 /**
  * ClusterController implements the CRUD actions for Cluster model.
@@ -33,11 +34,14 @@ class ClusterController extends Controller
     public function actionIndex()
     {
         $searchModel = new ClusterSearch();
+        $sector = new Sector();
+
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'sector' => $sector,
         ]);
     }
 
@@ -49,12 +53,14 @@ class ClusterController extends Controller
     public function actionCreate()
     {
         $model = new Cluster();
+        $sector = new Sector();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index']);
         } else {
             return $this->render('create', [
                 'model' => $model,
+                'sector' => $sector,
             ]);
         }
     }

@@ -66,9 +66,9 @@ class Sector extends \yii\db\ActiveRecord
         return $this->hasOne(Provincial::className(), ['id' => 'provincial_id']);
     }
 
-    public function getProvincialList()
+    public function getList()
     {
-        $model = Provincial::find()->orderBy('label ASC')->all();
+        $model = self::find()->orderBy('label ASC')->all();
         return ArrayHelper::map($model, 'id', 'label');
     }
 }

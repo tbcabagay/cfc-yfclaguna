@@ -49,14 +49,6 @@ class Service extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getMembers()
-    {
-        return $this->hasMany(Member::className(), ['service_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
     public function getUsers()
     {
         return $this->hasMany(User::className(), ['service_id' => 'id']);
@@ -66,5 +58,12 @@ class Service extends \yii\db\ActiveRecord
     {
         $model = self::find()->orderBy('name ASC')->all();
         return ArrayHelper::map($model, 'id', 'name');
+    }
+
+    public function getServiceName($id) {
+        $model = self::findOne($id);
+        if ($model)
+            return $model->name;
+        return null;
     }
 }

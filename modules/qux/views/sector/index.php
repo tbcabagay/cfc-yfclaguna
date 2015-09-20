@@ -21,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'provincial_id',
                 'value' => 'provincial.label',
-                'filter' => Html::activeDropDownList($searchModel, 'provincial_id', $searchModel->getProvincialList(), ['class'=>'form-control','prompt' => '']),
+                'filter' => Html::activeDropDownList($searchModel, 'provincial_id', $provincial->getList(), ['class'=>'form-control','prompt' => '']),
             ],
             'label',
 

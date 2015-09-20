@@ -101,9 +101,13 @@ class DocumentController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $model->scenario = Document::SCENARIO_UPDATE;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            $model->attachment_file = UploadedFile::getInstance($model, 'attachment_file');
+
+            if ($model->save() && $model->upload())
+                return $this->redirect(['index']);
         } else {
             return $this->render('update', [
                 'model' => $model,

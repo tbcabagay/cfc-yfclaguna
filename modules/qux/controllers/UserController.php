@@ -3,17 +3,16 @@
 namespace app\modules\qux\controllers;
 
 use Yii;
-use app\models\Service;
 use app\models\User;
 use app\models\UserSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\helpers\ArrayHelper;
-use app\models\Provincial;
-use app\models\Sector;
-use app\models\Cluster;
+use app\models\Service;
 use app\models\Chapter;
+use app\models\Cluster;
+use app\models\Sector;
+use app\models\Provincial;
 use yii\helpers\Json;
 
 /**
@@ -70,14 +69,16 @@ class UserController extends Controller
     public function actionCreate()
     {
         $model = new User();
+        $service = new Service();
 
-        $model->scenario = User::SCENARIO_REGISTER;
+        $model->scenario = User::SCENARIO_ADMIN_USER_REGISTER;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index']);
         } else {
             return $this->render('create', [
                 'model' => $model,
+                'service' => $service,
             ]);
         }
     }
@@ -91,12 +92,16 @@ class UserController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $service = new Service();
+
+        $model->scenario = User::SCENARIO_ADMIN_USER_REGISTER;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('update', [
                 'model' => $model,
+                'service' => $service,
             ]);
         }
     }

@@ -67,23 +67,15 @@ class Cluster extends \yii\db\ActiveRecord
         return $this->hasOne(Sector::className(), ['id' => 'sector_id']);
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getMembers()
-    {
-        return $this->hasMany(Member::className(), ['cluster_id' => 'id']);
-    }
-
-    /*public function getSectorList()
-    {
-        $model = Sector::find()->orderBy('label ASC')->all();
-        return ArrayHelper::map($model, 'id', 'label');
-    }*/
-
     public function getList()
     {
         $model = self::find()->orderBy('label ASC')->all();
         return ArrayHelper::map($model, 'id', 'label');
+    }
+
+    public static function getClusterType($id)
+    {
+        $model = static::findOne($id);
+        return $model->label;
     }
 }

@@ -19,13 +19,15 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'auth_key') ?>
 
+    <?= $form->field($model, 'division') ?>
+
+    <?= $form->field($model, 'service_id') ?>
+
     <?= $form->field($model, 'email') ?>
 
-    <?= $form->field($model, 'status') ?>
+    <?php // echo $form->field($model, 'status') ?>
 
-    <?= $form->field($model, 'role') ?>
-
-    <?php // echo $form->field($model, 'is_deleted') ?>
+    <?php // echo $form->field($model, 'role') ?>
 
     <?php // echo $form->field($model, 'created_at') ?>
 

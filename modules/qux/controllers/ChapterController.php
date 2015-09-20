@@ -8,6 +8,7 @@ use app\models\ChapterSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use app\models\Cluster;
 
 /**
  * ChapterController implements the CRUD actions for Chapter model.
@@ -33,11 +34,14 @@ class ChapterController extends Controller
     public function actionIndex()
     {
         $searchModel = new ChapterSearch();
+        $cluster = new Cluster();
+
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'cluster' => $cluster,
         ]);
     }
 
@@ -49,12 +53,14 @@ class ChapterController extends Controller
     public function actionCreate()
     {
         $model = new Chapter();
+        $cluster = new Cluster();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index']);
         } else {
             return $this->render('create', [
                 'model' => $model,
+                'cluster' => $cluster,
             ]);
         }
     }

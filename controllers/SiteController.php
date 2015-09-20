@@ -8,10 +8,9 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\models\Auth;
 use app\models\User;
-use app\models\Member;
+use app\models\UserProfile;
 use app\models\Service;
 use app\models\Cluster;
-use app\models\UserProfile;
 use yii\web\BadRequestHttpException;
 use yii\web\UploadedFile;
 use app\models\LoginForm;
@@ -65,23 +64,34 @@ class SiteController extends Controller
 
     public function actionRegister()
     {
-        $member = new Member();
+        $user = new User();
+        $userProfile = new UserProfile();
         $service = new Service();
         $cluster = new Cluster();
 
-        $member->scenario = Member::SCENARIO_REGISTER;
+        $user->scenario = User::SCENARIO_GUEST_REGISTER;
+        $userProfile->scenario = User::SCENARIO_GUEST_REGISTER;
 
-        if ($member->load(Yii::$app->request->post())) {
-            $member->image_file = UploadedFile::getInstance($member, 'image_file');
+        if ($user->load(Yii::$app->request->post()) && $userProfile->load(Yii::$app->request->post())) {
+            $user->role = 'member';
+            $transaction = $user->getDb()->beginTransaction();
 
-            if ($member->save()) {
-                \Yii::$app->session->setFlash('contact-success', 'Thank you! Your information has been saved.');
-                return $this->redirect(['register']);
+            if ($user->save()) {
+                var_dump('User ID ' . $user->id);
+                $userProfile->user_id = $user->id;
+
+                if ($userProfile->save()) {
+                    $transaction->commit();
+
+                    \Yii::$app->session->setFlash('contact-success', 'Thank you! Your information has been saved.');
+                    return $this->redirect(['register']);
+                }
             }
         }
 
         return $this->render('register', [
-            'member' => $member,
+            'user' => $user,
+            'userProfile' => $userProfile,
             'service' => $service,
             'cluster' => $cluster,
         ]);
@@ -143,6 +153,7 @@ class SiteController extends Controller
 
                 if ($userProfile === null) {
                     $modelUserprofile = new UserProfile();
+                    $modelUserprofile->scenario = UserProfile::SCENARIO_AUTH_REGISTER;
                     $modelUserprofile->user_id = $login->id;
                     $modelUserprofile->family_name = $attributes['name']['familyName'];
                     $modelUserprofile->given_name = $attributes['name']['givenName'];

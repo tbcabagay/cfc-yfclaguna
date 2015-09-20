@@ -21,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'sector_id',
                 'value' => 'sector.label',
-                'filter' => Html::activeDropDownList($searchModel, 'sector_id', $searchModel->getSectorList(), ['class'=>'form-control','prompt' => '']),
+                'filter' => Html::activeDropDownList($searchModel, 'sector_id', $sector->getList(), ['class'=>'form-control','prompt' => '']),
             ],
             'label',
 

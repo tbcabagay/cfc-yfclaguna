@@ -4,10 +4,10 @@ use yii\helpers\Html;
 ?>
 
 <div class="comment-section">
-    <?= Html::img($model->user->userProfiles->image, ['alt' => 'profile picture', 'style' => 'margin-right: 10px;', 'class' => 'pull-left']) ?>
+    <?= Html::img($model->user->profile_image, ['alt' => 'profile picture', 'height' => 60, 'style' => 'margin-right: 10px;', 'class' => 'pull-left']) ?>
     <p>
-        <strong><?= Html::encode($model->user->userProfiles->getFullName()) ?></strong>
-        <small><?= Yii::$app->formatter->asDate($model->created_at, 'php:M d, Y g:i:s A') ?></small>
+        <strong><?= Html::encode($model->user->full_name) ?></strong><br />
+        <span class="text-muted"><em><?= Yii::$app->formatter->asDate($model->created_at, 'php:M d, Y g:i:s A') ?></em></span>
     </p>
 
     <p class="comment-content"><?= Html::encode($model->content) ?></p>

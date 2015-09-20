@@ -21,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'service_id',
                 'value' => 'service.name',
-                'filter' => Html::activeDropDownList($searchModel, 'service_id', $service->getServiceList(), ['class'=>'form-control','prompt' => '']),
+                'filter' => Html::activeDropDownList($searchModel, 'service_id', $service->getList(), ['class'=>'form-control','prompt' => '']),
             ],
             'email:email',
             [
@@ -35,18 +35,6 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'created_at',
                 'value' => 'created_at',
-                'filterType' => GridView::FILTER_DATE,
-                'filterWidgetOptions' => [
-                    'pluginOptions' => [
-                        'format' => 'yyyy-mm-dd',
-                        'autoclose' => true,
-                        'todayHighlight' => true,
-                    ],
-                ],
-            ],
-            [
-                'attribute' => 'updated_at',
-                'value' => 'updated_at',
                 'filterType' => GridView::FILTER_DATE,
                 'filterWidgetOptions' => [
                     'pluginOptions' => [

@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="page-header">
         <h1><?= Html::encode($model->title) ?></h1>
         <p>
-            <span class="glyphicon glyphicon-user" aria-hidden="true"></span> <?= Html::encode($model->user->userProfiles->getFullName()) ?>
+            <span class="glyphicon glyphicon-user" aria-hidden="true"></span> <?= Html::encode($model->user->full_name) ?>
             <span class="glyphicon glyphicon-calendar" aria-hidden="true"> </span> <?= Yii::$app->formatter->asDate($model->created_at, 'php:M d, Y g:i:s A') ?>
             <?php /*if (\Yii::$app->user->can('updatePost', ['post' => $model])): ?>
             <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-xs btn-primary']) ?>

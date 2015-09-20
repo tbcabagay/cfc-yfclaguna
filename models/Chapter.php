@@ -56,10 +56,4 @@ class Chapter extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Cluster::className(), ['id' => 'cluster_id']);
     }
-
-    public function getClusterList()
-    {
-        $model = Cluster::find()->orderBy('label ASC')->all();
-        return ArrayHelper::map($model, 'id', 'label');
-    }
 }

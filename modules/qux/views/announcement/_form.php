@@ -1,7 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use kartik\form\ActiveForm;
 use kartik\markdown\MarkdownEditor;
 
 /* @var $this yii\web\View */
