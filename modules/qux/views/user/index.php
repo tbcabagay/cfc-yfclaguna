@@ -20,7 +20,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
             [
                 'attribute' => 'service_id',
-                'value' => 'service.name',
+                'value' => function($model, $index, $widget) {
+                    return ucfirst($model->division_label) . ' ' . $model->service->name;
+                },
                 'filter' => Html::activeDropDownList($searchModel, 'service_id', $service->getList(), ['class'=>'form-control','prompt' => '']),
             ],
             'email:email',

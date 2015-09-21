@@ -13,6 +13,7 @@ use yii\filters\VerbFilter;
 use yii\helpers\Url;
 use yii\web\UploadedFile;
 use yii\filters\AccessControl;
+use app\models\User;
 
 /**
  * DocumentController implements the CRUD actions for Document model.
@@ -98,6 +99,28 @@ class DocumentController extends Controller
 
                     if ($documentStatus->save()) {
                         $transaction->commit();
+
+                        $recipients = User::find()
+                            ->select(['email'])
+                            ->where('division_id=:division_id AND division_label=:division_label AND username IS NULL')
+                            ->addParams([
+                                ':division_id' => $findTo['id'],
+                                ':division_label' => $findTo['label'],
+                            ])
+                            ->asArray()
+                            ->all();
+
+                        $messages = [];
+
+                        foreach ($recipients as $recipient) {
+                            $messages[] = Yii::$app->mailer->compose('document/create', ['id' => $model->id, 'remarks' => $model->remarks])
+                                ->setFrom(\Yii::$app->params['mailer'])
+                                ->setTo($recipient['email'])
+                                ->setSubject($model->user->full_name . ' - ' . $model->title);
+                        }
+
+                        \Yii::$app->mailer->sendMultiple($messages);
+
                         return $this->redirect(['index']);
                     }
 
