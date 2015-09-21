@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use kartik\grid\GridView;
+use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\UserSearch */
@@ -33,7 +34,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $model->filterStatus($model->status);
                 },
             ],
-            'role',
+            [
+                'attribute' => 'role',
+                'value' => 'role',
+                'filter' => Html::activeDropDownList($searchModel, 'role', ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'name'), ['class'=>'form-control','prompt' => '']),
+            ],
             [
                 'attribute' => 'created_at',
                 'value' => 'created_at',
@@ -47,7 +52,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
             ],
 
-            //['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{update} {delete}'
+            ],
         ],
         'panel' => [
             'type' => GridView::TYPE_PRIMARY,

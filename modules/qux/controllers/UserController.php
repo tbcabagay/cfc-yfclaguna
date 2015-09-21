@@ -16,6 +16,7 @@ use app\models\Sector;
 use app\models\Provincial;
 use yii\helpers\Json;
 use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 
 /**
  * UserController implements the CRUD actions for User model.
@@ -122,19 +123,37 @@ class UserController extends Controller
             $model = $this->findModel($id);
             $service = new Service();
 
-            $model->scenario = User::SCENARIO_ADMIN_USER_REGISTER;
+            $model->scenario = User::SCENARIO_ADMIN_USER_UPDATE;
 
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+                return $this->redirect(['index']);
             } else {
                 return $this->render('update', [
                     'model' => $model,
                     'service' => $service,
+                    'data' => $this->divisionData($model)
                 ]);
             }
         } else {
             throw new ForbiddenHttpException('You are not allowed to access this page');
         }
+    }
+
+    protected function divisionData($model)
+    {
+        $data = [];
+
+        if ($model->division_label == 'chapter') {
+            $data = ArrayHelper::map(Chapter::find()->asArray()->all(), 'id', 'label');
+        } else if ($model->division_label == 'cluster') {
+            $data = ArrayHelper::map(Cluster::find()->asArray()->all(), 'id', 'label');
+        } else if ($model->division_label == 'sector') {
+            $data = ArrayHelper::map(Sector::find()->asArray()->all(), 'id', 'label');
+        } else if ($model->division_label == 'Provincial') {
+            $data = ArrayHelper::map(Provincial::find()->asArray()->all(), 'id', 'label');
+        }
+
+        return $data;
     }
 
     /**
@@ -145,8 +164,12 @@ class UserController extends Controller
      */
     public function actionDelete($id)
     {
+        $model = $this->findModel($id);
+        $model->scenario = User::SCENARIO_ACTIVATE;
+
         if (\Yii::$app->user->can('createUser')) {
-            $this->findModel($id)->delete();
+            $model->status = User::STATUS_DELETE;
+            $model->save();
 
             return $this->redirect(['index']);
         } else {

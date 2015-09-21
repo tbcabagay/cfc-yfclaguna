@@ -36,6 +36,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     const SCENARIO_ADMIN_REGISTER = 'admin_register';
     const SCENARIO_GUEST_REGISTER = 'guest_register';
     const SCENARIO_ADMIN_USER_REGISTER = 'admin_user_register';
+    const SCENARIO_ADMIN_USER_UPDATE = 'admin_user_update';
     const SCENARIO_MEMBER_CREATE = 'member_create';
     const SCENARIO_ACTIVATE = 'activate';
     const STATUS_ACTIVE = 1;
@@ -57,6 +58,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         $scenarios[self::SCENARIO_GUEST_REGISTER] = ['service_id', 'cluster_id', 'username', 'password', 'confirm_password', 'email', 'captcha'];
         $scenarios[self::SCENARIO_MEMBER_CREATE] = ['service_id', 'cluster_id', 'role', 'username', 'password', 'confirm_password', 'email'];
         $scenarios[self::SCENARIO_ADMIN_USER_REGISTER] = ['email', 'role', 'division_id', 'division_label', 'service_id'];
+        $scenarios[self::SCENARIO_ADMIN_USER_UPDATE] = ['email', 'role', 'division_id', 'division_label', 'service_id', 'status'];
         $scenarios[self::SCENARIO_ACTIVATE] = ['status'];
 
         return $scenarios;
@@ -76,9 +78,10 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function rules()
     {
         return [
-            [['username', 'password', 'confirm_password', 'cluster_id' ,'auth_key', 'division_id', 'division_label', 'service_id', 'email', 'status', 'role', 'created_at'], 'required'],
+            [['username', 'password', 'confirm_password', 'cluster_id' ,'auth_key', 'service_id', 'email', 'status', 'role', 'created_at'], 'required'],
             [['division_id', 'service_id', 'cluster_id', 'status'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
+            [['division_label', 'division_id'], 'required', 'on' => self::SCENARIO_ADMIN_USER_REGISTER],
             [['username', 'email'], 'unique'],
             ['email', 'email'],
             ['captcha', 'captcha'],

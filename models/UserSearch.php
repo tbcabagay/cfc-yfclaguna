@@ -56,20 +56,12 @@ class UserSearch extends User
         }
 
         $query->andFilterWhere([
-            'id' => $this->id,
-            'division_id' => $this->division_id,
             'service_id' => $this->service_id,
-            'cluster_id' => $this->cluster_id,
             'status' => $this->status,
         ]);
 
-        $query->andFilterWhere(['like', 'auth_key', $this->auth_key])
-            ->andFilterWhere(['like', 'division_label', $this->division_label])
-            ->andFilterWhere(['like', 'username', $this->username])
-            ->andFilterWhere(['like', 'password_hash', $this->password_hash])
-            ->andFilterWhere(['like', 'email', $this->email])
+        $query->andFilterWhere(['like', 'email', $this->email])
             ->andFilterWhere(['like', 'created_at', $this->created_at])
-            ->andFilterWhere(['like', 'updated_at', $this->updated_at])
             ->andFilterWhere(['like', 'role', $this->role]);
 
         return $dataProvider;
