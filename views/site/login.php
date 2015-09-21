@@ -44,7 +44,7 @@ $this->title = 'Login';
             </div>
 
             <div class="col-md-6">
-                <p>To login to the <strong><?= \Yii::$app->params['appName'] ?></strong>, click on the Google button below.</p>
+                <p>To login to the <strong><?= \Yii::$app->params['appOwner'] ?></strong>, click on the Google button below.</p>
 
                 <?= yii\authclient\widgets\AuthChoice::widget([
                     'baseAuthUrl' => ['site/auth'],

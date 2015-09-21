@@ -40,7 +40,7 @@ else
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => Yii::$app->params['appName'],
+        'brandLabel' => Yii::$app->params['appOwner'],
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
@@ -115,7 +115,7 @@ else
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; <?= Yii::$app->params['appName'] . ' ' . date('Y') ?></p>
+        <p class="pull-left">&copy; <?= Yii::$app->params['appOwner'] . ' ' . date('Y') ?></p>
 
         <p class="pull-right"><?= Yii::powered() ?></p>
     </div>

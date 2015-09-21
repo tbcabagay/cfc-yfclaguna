@@ -28,7 +28,7 @@ AppAsset::register($this);
 <?php if (yii::$app->controller->action->id !== 'error'): ?>
     <?php
     NavBar::begin([
-        'brandLabel' => \Yii::$app->params['appName'],
+        'brandLabel' => \Yii::$app->params['appOwner'],
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',

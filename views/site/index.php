@@ -8,8 +8,7 @@ $this->title = 'Home';
 
 <section class="module content header">
     <div class="container">
-        <h1><?= \Yii::$app->params['appName'] ?></h1>
-        <p><?= \Yii::$app->params['appOwner'] ?></p>
+        <h1><?= \Yii::$app->params['appOwner'] ?></h1>
     </div>
 </section>
 
