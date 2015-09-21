@@ -607,16 +607,16 @@
         },
         {
             "name": "kartik-v/bootstrap-star-rating",
-            "version": "v3.5.3",
+            "version": "v3.5.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kartik-v/bootstrap-star-rating.git",
-                "reference": "bd9c52db6ac71cb270620c1aee601d142ab2cc00"
+                "reference": "90d446de44e1251bfcb254b51f15c5066e6ebdc8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kartik-v/bootstrap-star-rating/zipball/bd9c52db6ac71cb270620c1aee601d142ab2cc00",
-                "reference": "bd9c52db6ac71cb270620c1aee601d142ab2cc00",
+                "url": "https://api.github.com/repos/kartik-v/bootstrap-star-rating/zipball/90d446de44e1251bfcb254b51f15c5066e6ebdc8",
+                "reference": "90d446de44e1251bfcb254b51f15c5066e6ebdc8",
                 "shasum": ""
             },
             "type": "library",
@@ -644,7 +644,7 @@
                 "jquery",
                 "star"
             ],
-            "time": "2015-06-18 14:42:46"
+            "time": "2015-09-20 13:47:11"
         },
         {
             "name": "kartik-v/dependent-dropdown",

@@ -8,8 +8,10 @@ use app\models\Announcement;
 use app\models\AnnouncementSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\filters\VerbFilter;
 use yii\data\ActiveDataProvider;
+use yii\filters\AccessControl;
 
 /**
  * AnnouncementController implements the CRUD actions for Announcement model.
@@ -19,6 +21,15 @@ class AnnouncementController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -34,13 +45,17 @@ class AnnouncementController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new AnnouncementSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        if (\Yii::$app->user->can('createAnnouncement')) {
+            $searchModel = new AnnouncementSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
+        } else {
+            throw new ForbiddenHttpException('You are not allowed to access this page');
+        }
     }
 
     /**
@@ -81,15 +96,19 @@ class AnnouncementController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Announcement();
-        $model->scenario = Announcement::SCENARIO_CREATE;
+        if (\Yii::$app->user->can('createAnnouncement')) {
+            $model = new Announcement();
+            $model->scenario = Announcement::SCENARIO_CREATE;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return $this->redirect(['index']);
+            } else {
+                return $this->render('create', [
+                    'model' => $model,
+                ]);
+            }
         } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+            throw new ForbiddenHttpException('You are not allowed to access this page');
         }
     }
 
@@ -103,10 +122,17 @@ class AnnouncementController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+        if ($model->load(Yii::$app->request->post())) {
+            if (\Yii::$app->user->can('updatePost', ['post' => $model])) {
+                $model->save();
+                return $this->redirect(['index']);
+            } else {
+                \Yii::$app->session->setFlash('update-error', 'You can\'t edit other user\'s annoucement post.');
+                return $this->redirect(['update', 'id' => $model->id]);
+            }
+
+            
         } else {
-            print_r($model->getErrors());
             return $this->render('update', [
                 'model' => $model,
             ]);
@@ -121,7 +147,12 @@ class AnnouncementController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+
+        if (\Yii::$app->user->can('deletePost', ['post' => $model])) {
+            $model->status = Announcement::STATUS_DELETE;
+            $model->save();
+        }
 
         return $this->redirect(['index']);
     }

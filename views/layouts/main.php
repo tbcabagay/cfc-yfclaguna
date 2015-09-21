@@ -25,6 +25,7 @@ AppAsset::register($this);
 <?php $this->beginBody() ?>
 
 <div class="wrap">
+<?php if (yii::$app->controller->action->id !== 'error'): ?>
     <?php
     NavBar::begin([
         'brandLabel' => \Yii::$app->params['appName'],
@@ -34,22 +35,22 @@ AppAsset::register($this);
         ],
     ]);
     echo Nav::widget([
+        'encodeLabels' => false,
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'Register', 'url' => ['/site/register']],
+            ['label' => '<span class="glyphicon glyphicon-home"></span> Home', 'url' => ['/site/index']],
+            ['label' => '<span class="glyphicon glyphicon-user"></span> Register', 'visible' => Yii::$app->user->isGuest, 'url' => ['/site/register']],
             Yii::$app->user->isGuest ?
-                ['label' => 'Login', 'url' => ['/site/login']] :
+                ['label' => '<span class="glyphicon glyphicon-log-in"></span> Login', 'url' => ['/site/login']] :
                 [
-                    'label' => 'Logout (' . Yii::$app->user->identity->email . ')',
-                    'url' => ['/site/logout'],
-                    'linkOptions' => ['data-method' => 'post']
+                    'label' => '<span class="glyphicon glyphicon-log-in"></span> Go to app',
+                    'url' => ['/qux/default/index'],
                 ],
         ],
     ]);
     NavBar::end();
     ?>
-
+<?php endif; ?>
     <div class="container">
         <?= Breadcrumbs::widget([
             'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],

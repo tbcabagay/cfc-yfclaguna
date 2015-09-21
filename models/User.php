@@ -55,8 +55,8 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         $scenarios = parent::scenarios();
 
         $scenarios[self::SCENARIO_GUEST_REGISTER] = ['service_id', 'cluster_id', 'username', 'password', 'confirm_password', 'email', 'captcha'];
-        $scenarios[self::SCENARIO_MEMBER_CREATE] = ['service_id', 'cluster_id', 'username', 'password', 'confirm_password', 'email'];
-        $scenarios[self::SCENARIO_ADMIN_USER_REGISTER] = ['email', /*'role',*/ 'division_id', 'division_label', 'service_id'];
+        $scenarios[self::SCENARIO_MEMBER_CREATE] = ['service_id', 'cluster_id', 'role', 'username', 'password', 'confirm_password', 'email'];
+        $scenarios[self::SCENARIO_ADMIN_USER_REGISTER] = ['email', 'role', 'division_id', 'division_label', 'service_id'];
         $scenarios[self::SCENARIO_ACTIVATE] = ['status'];
 
         return $scenarios;
@@ -84,11 +84,10 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             ['captcha', 'captcha'],
             [['confirm_password'], 'compare', 'compareAttribute' => 'password', 'message' => 'Passwords do not match'],
             [['auth_key'], 'string', 'max' => 32],
-            [['division_label'], 'string', 'max' => 20],
+            [['division_label', 'role'], 'string', 'max' => 20],
             [['username'], 'string', 'max' => 50],
             [['password_hash'], 'string', 'max' => 100],
             [['email'], 'string', 'max' => 255],
-            [['role'], 'string', 'max' => 15]
         ];
     }
 
@@ -232,7 +231,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 
     public static function findByEmail($email)
     {
-        return static::findOne(['email' => $email, 'status' => self::STATUS_ACTIVE]);
+        return static::findOne(['email' => $email, 'status' => self::STATUS_ACTIVE, 'username' => null]);
     }
 
     public function validatePassword($password)
@@ -259,6 +258,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return [
             self::STATUS_ACTIVE => 'STATUS_ACTIVE',
             self::STATUS_DELETE => 'STATUS_DELETE',
+            self::STATUS_INACTIVE => 'STATUS_INACTIVE',
         ];
     }
 
@@ -268,6 +268,8 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             return 'STATUS_ACTIVE';
         else if ($id === self::STATUS_DELETE)
             return 'STATUS_DELETE';
+        else if ($id === self::STATUS_INACTIVE)
+            return 'STATUS_INACTIVE';
     }
 
     public function beforeSave($insert)
@@ -276,8 +278,10 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             if ($this->isNewRecord) {
                 if ($this->scenario == self::SCENARIO_ADMIN_REGISTER || $this->scenario == self::SCENARIO_ADMIN_USER_REGISTER || $this->scenario == self::SCENARIO_MEMBER_CREATE)
                     $this->status = self::STATUS_ACTIVE;
-                else if ($this->scenario == self::SCENARIO_GUEST_REGISTER)
+                else if ($this->scenario == self::SCENARIO_GUEST_REGISTER) {
                     $this->status = self::STATUS_INACTIVE;
+                    $this->role = 'member';
+                }
 
                 $this->password_hash = Yii::$app->security->generatePasswordHash($this->password);
                 $this->auth_key = Yii::$app->security->generateRandomString();

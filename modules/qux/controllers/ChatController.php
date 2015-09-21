@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\qux\controllers;
 
 use Yii;
 use yii\filters\AccessControl;
@@ -16,7 +16,6 @@ class ChatController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['index', 'send-chat'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],

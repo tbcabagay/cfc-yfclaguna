@@ -9,8 +9,10 @@ use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\modules\qux\assets\QuxAsset;
 use kartik\widgets\TypeaheadBasic;
+use kartik\icons\Icon;
 
 QuxAsset::register($this);
+Icon::map($this);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -48,25 +50,26 @@ else
         'options' => ['class' => 'navbar-nav navbar-right'],
         'encodeLabels' => false,
         'items' => [
-            ['label' => 'Home', 'url' => ['/qux/default/index']],
-            ['label' => 'Announcements', 'url' => ['/qux/announcement/index']],
-            ['label' => 'Documents', 'items' => [
+            ['label' => '<i class="fa fa-home"></i> Home', 'url' => ['/qux/default/index']],
+            ['label' => '<i class="fa fa-comments"></i> Chat', 'url' => ['/qux/chat/index']],
+            ['label' => '<i class="fa fa-bullhorn"></i> Announcements', 'visible' => \Yii::$app->user->can('createAnnouncement'), 'url' => ['/qux/announcement/index']],
+            ['label' => '<i class="fa fa-folder"></i> Documents', 'visible' => \Yii::$app->user->can('createDocument'), 'items' => [
                 ['label' => 'My Documents', 'url' => ['/qux/document/index']],
                 ['label' => 'Receive', 'url' => ['/qux/document-status/receive']],
                 ['label' => 'Release', 'url' => ['/qux/document-status/release']],
             ]],
-            ['label' => 'Users', 'items' => [
+            ['label' => '<i class="fa fa-users"></i> Users', 'visible' => \Yii::$app->user->can('createUser'), 'items' => [
                 ['label' => 'Manage', 'url' => ['/qux/user/index']],
                 ['label' => 'Activate', 'url' => ['/qux/user-profile/activate']],
                 ['label' => 'Member Register', 'url' => ['/qux/user-profile/member-create']],
             ]],
-            ['label' => 'Divisions', 'items' => [
+            ['label' => '<i class="fa fa-bars"></i> Divisions', 'visible' => \Yii::$app->user->can('createDivision'), 'items' => [
                 ['label' => 'Provincial', 'url' => ['/qux/provincial/index']],
                 ['label' => 'Sector', 'url' => ['/qux/sector/index']],
                 ['label' => 'Cluster', 'url' => ['/qux/cluster/index']],
                 ['label' => 'Chapter', 'url' => ['/qux/chapter/index']],
             ]],
-            ['label' => 'Services', 'url' => ['/qux/service/index']],
+            ['label' => '<i class="fa fa-tasks"></i> Services', 'visible' => \Yii::$app->user->can('createService'), 'url' => ['/qux/service/index']],
             ['label' => Html::img(\Yii::$app->session->get('userProfile.url'), ['alt' => 'profile picture', 'height' => 20, 'style' => 'margin-right: 8px;']) . \Yii::$app->session->get('userProfile.name'), 'items' => [
                     [
                         'label' => 'Profile',

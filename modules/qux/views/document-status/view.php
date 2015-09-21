@@ -8,6 +8,7 @@ use kartik\grid\GridView;
 /* @var $model app\models\DocumentStatus */
 
 $this->title = 'Document Trail';
+$this->params['breadcrumbs'][] = ['label' => 'Documents', 'url' => ['document/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="document-status-view">
@@ -19,11 +20,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <dl class="dl-horizontal">            
             <dt>Author</dt>
-            <dd><?= Html::encode($model->user->userProfiles->getFullName()) ?></dd>
+            <dd><?= Html::encode($model->user->full_name) ?></dd>
             <dt>Area</dt>
             <dd><?= Html::encode($model->user->division) ?></dd>
             <dt>Original Attachment</dt>
-            <dd><?= Html::a('<span class="glyphicon glyphicon-floppy-disk"></span> Save', ['qux/document/download', 'id' => $model->id]) ?></dd>
+            <dd><?= Html::a('<span class="glyphicon glyphicon-floppy-disk"></span> Save', ['/qux/document/download', 'id' => $model->id]) ?></dd>
             <dt>Status</dt>
             <dd><?= $model->getStatus($model->status) ?></dd>
             <dt>Created At</dt>

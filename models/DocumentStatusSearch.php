@@ -80,12 +80,12 @@ class DocumentStatusSearch extends DocumentStatus
     {
         $query = DocumentStatus::find()
             ->joinWith(['document', 'document.user'])
-            ->where('(document.status=:status_new OR document.status=:status_release) AND document_status.to_id=:to_id AND document_status.to_label=:to_label')
+            ->where('(document.status=:status_new OR document.status=:status_release) AND document_status.to_id=:to_id AND document_status.to_label=:to_label AND document_status.received_by IS NULL')
             ->addParams([
                 ':status_new' => parent::FILE_NEW,
                 ':status_release' => parent::FILE_RECEIVE,
-                'to_id' => \Yii::$app->user->identity->division_id,
-                'to_label' => \Yii::$app->user->identity->division_label,
+                ':to_id' => \Yii::$app->user->identity->division_id,
+                ':to_label' => \Yii::$app->user->identity->division_label,
             ]);
 
         $dataProvider = new ActiveDataProvider([

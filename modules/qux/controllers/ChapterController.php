@@ -7,8 +7,10 @@ use app\models\Chapter;
 use app\models\ChapterSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\filters\VerbFilter;
 use app\models\Cluster;
+use yii\filters\AccessControl;
 
 /**
  * ChapterController implements the CRUD actions for Chapter model.
@@ -18,6 +20,15 @@ class ChapterController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -33,16 +44,20 @@ class ChapterController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new ChapterSearch();
-        $cluster = new Cluster();
+        if (\Yii::$app->user->can('createDivision')) {
+            $searchModel = new ChapterSearch();
+            $cluster = new Cluster();
 
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'cluster' => $cluster,
-        ]);
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'cluster' => $cluster,
+            ]);
+        } else {
+            throw new ForbiddenHttpException('You are not allowed to access this page');
+        }
     }
 
     /**
@@ -52,16 +67,20 @@ class ChapterController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Chapter();
-        $cluster = new Cluster();
+        if (\Yii::$app->user->can('createDivision')) {
+            $model = new Chapter();
+            $cluster = new Cluster();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return $this->redirect(['index']);
+            } else {
+                return $this->render('create', [
+                    'model' => $model,
+                    'cluster' => $cluster,
+                ]);
+            }
         } else {
-            return $this->render('create', [
-                'model' => $model,
-                'cluster' => $cluster,
-            ]);
+            throw new ForbiddenHttpException('You are not allowed to access this page');
         }
     }
 
@@ -73,14 +92,18 @@ class ChapterController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        if (\Yii::$app->user->can('createDivision')) {
+            $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return $this->redirect(['index']);
+            } else {
+                return $this->render('update', [
+                    'model' => $model,
+                ]);
+            }
         } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+            throw new ForbiddenHttpException('You are not allowed to access this page');
         }
     }
 
@@ -92,9 +115,13 @@ class ChapterController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        if (\Yii::$app->user->can('createDivision')) {
+            $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+            return $this->redirect(['index']);
+        } else {
+            throw new ForbiddenHttpException('You are not allowed to access this page');
+        }
     }
 
     /**

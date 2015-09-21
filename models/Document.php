@@ -117,6 +117,8 @@ class Document extends \yii\db\ActiveRecord
             }
 
             if ($this->attachment_file !== null) {
+                $this->deleteFile();
+
                 $this->attachment_path = \Yii::getAlias('@app') . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'document' . DIRECTORY_SEPARATOR . \Yii::$app->user->identity->id . DIRECTORY_SEPARATOR . time();
                 $this->attachment = $this->attachment_path . DIRECTORY_SEPARATOR . $this->attachment_file->baseName . '.' . $this->attachment_file->extension;
             }
@@ -206,18 +208,19 @@ class Document extends \yii\db\ActiveRecord
         }
     }
 
-    /*public function deleteFile()
+    public function deleteFile()
     {
+        $baseName = dirname($this->attachment);
+
         if (empty($this->attachment) || !file_exists($this->attachment))
             return false;
 
         if (is_file($this->attachment) && !unlink($this->attachment))
             return false;
 
-        $uploadDir = \Yii::getAlias('@app') . '/uploads/create/' . $this->id;
-        if (is_dir($uploadDir) && !rmdir($uploadDir))
+        if (is_dir($baseName) && !rmdir($baseName))
             return false;
 
         return true;
-    }*/
+    }
 }

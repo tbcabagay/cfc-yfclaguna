@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="well well-sm">
         <dl class="dl-horizontal">
             <dt>Author</dt>
-            <dd><?= Html::encode($model->document->user->userProfiles->getFullName()) ?></dd>
+            <dd><?= Html::encode($model->document->user->full_name) ?></dd>
             <dt>Area</dt>
             <dd><?= Html::encode($model->document->user->division) ?></dd>
             <dt>Title</dt>

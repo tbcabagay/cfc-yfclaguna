@@ -8,9 +8,11 @@ use app\models\DocumentSearch;
 use app\models\DocumentStatus;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\Url;
 use yii\web\UploadedFile;
+use yii\filters\AccessControl;
 
 /**
  * DocumentController implements the CRUD actions for Document model.
@@ -20,6 +22,15 @@ class DocumentController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -35,13 +46,17 @@ class DocumentController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new DocumentSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        if (\Yii::$app->user->can('createDocument')) {
+            $searchModel = new DocumentSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
+        } else {
+            throw new ForbiddenHttpException('You are not allowed to access this page');
+        }
     }
 
     /**
@@ -51,44 +66,52 @@ class DocumentController extends Controller
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        if (\Yii::$app->user->can('createDocument')) {
+            return $this->render('view', [
+                'model' => $this->findModel($id),
+            ]);
+        } else {
+            throw new ForbiddenHttpException('You are not allowed to access this page');
+        }
     }
 
     public function actionCreate()
     {
-        $model = new Document();
-        $model->scenario = Document::SCENARIO_CREATE;
+        if (\Yii::$app->user->can('createDocument')) {
+            $model = new Document();
+            $model->scenario = Document::SCENARIO_CREATE;
 
-        if ($model->load(Yii::$app->request->post())) {
-            $model->attachment_file = UploadedFile::getInstance($model, 'attachment_file');
+            if ($model->load(Yii::$app->request->post())) {
+                $model->attachment_file = UploadedFile::getInstance($model, 'attachment_file');
 
-            if ($model->save() && $model->upload()) {
-                $transaction = $model->getDb()->beginTransaction();
-                $findTo = $model->findToDivision();
+                if ($model->save() && $model->upload()) {
+                    $transaction = $model->getDb()->beginTransaction();
+                    $findTo = $model->findToDivision();
 
-                $documentStatus = new DocumentStatus([
-                    'document_id' => $model->id,
-                    'from_id' => \Yii::$app->user->identity->division_id,
-                    'from_label' => \Yii::$app->user->identity->division_label,
-                    'to_id' => $findTo['id'],
-                    'to_label' => $findTo['label'],
-                ]);
+                    $documentStatus = new DocumentStatus([
+                        'document_id' => $model->id,
+                        'from_id' => \Yii::$app->user->identity->division_id,
+                        'from_label' => \Yii::$app->user->identity->division_label,
+                        'to_id' => $findTo['id'],
+                        'to_label' => $findTo['label'],
+                    ]);
 
-                if ($documentStatus->save()) {
-                    $transaction->commit();
-                    return $this->redirect(['index']);
+                    if ($documentStatus->save()) {
+                        $transaction->commit();
+                        return $this->redirect(['index']);
+                    }
+
+                    print_r($documentStatus->getErrors());
                 }
 
-                print_r($documentStatus->getErrors());
+                print_r($model->getErrors());
+            } else {
+                return $this->render('create', [
+                    'model' => $model,
+                ]);
             }
-
-            print_r($model->getErrors());
         } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+            throw new ForbiddenHttpException('You are not allowed to access this page');
         }
     }
 
@@ -103,15 +126,25 @@ class DocumentController extends Controller
         $model = $this->findModel($id);
         $model->scenario = Document::SCENARIO_UPDATE;
 
-        if ($model->load(Yii::$app->request->post())) {
-            $model->attachment_file = UploadedFile::getInstance($model, 'attachment_file');
+        if (\Yii::$app->user->can('updatePost', ['post' => $model])) {
+            if ($model->load(Yii::$app->request->post())) {
+                $model->attachment_file = UploadedFile::getInstance($model, 'attachment_file');
 
-            if ($model->save() && $model->upload())
+                if ($model->status != Document::FILE_NEW) {
+                    \Yii::$app->session->setFlash('update-error', 'Can\' update a document that has already been received by other offices.');
+                } else {
+                    $model->save();
+                    $model->upload();
+                }
+
                 return $this->redirect(['index']);
+            } else {
+                return $this->render('update', [
+                    'model' => $model,
+                ]);
+            }
         } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+            throw new ForbiddenHttpException('You are not allowed to access this page');
         }
     }
 
@@ -123,7 +156,12 @@ class DocumentController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+
+        if (\Yii::$app->user->can('deletePost', ['post' => $model])) {
+            $model->delete();
+            $model->deleteFile();
+        }
 
         return $this->redirect(['index']);
     }

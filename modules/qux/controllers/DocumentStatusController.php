@@ -13,6 +13,7 @@ use yii\db\Expression;
 use yii\web\UploadedFile;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
+use yii\filters\AccessControl;
 
 /**
  * DocumentStatusController implements the CRUD actions for DocumentStatus model.
@@ -22,6 +23,15 @@ class DocumentStatusController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -29,21 +39,6 @@ class DocumentStatusController extends Controller
                 ],
             ],
         ];
-    }
-
-    /**
-     * Lists all DocumentStatus models.
-     * @return mixed
-     */
-    public function actionIndex()
-    {
-        $searchModel = new DocumentStatusSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
     }
 
     /**
@@ -58,6 +53,7 @@ class DocumentStatusController extends Controller
         $query = DocumentStatus::find()
             ->joinWith(['document', 'document.user'])
             ->where(['document_status.document_id' => $id])
+            ->andWhere('document_status.released_by IS NOT NULL')
             ->orderBy('document_status.received_at DESC');
 
         $dataProvider = new ActiveDataProvider([
@@ -70,56 +66,6 @@ class DocumentStatusController extends Controller
             'dataProvider' => $dataProvider,
             'model' => $model,
         ]);
-    }
-
-    /**
-     * Creates a new DocumentStatus model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new DocumentStatus();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
-        }
-    }
-
-    /**
-     * Updates an existing DocumentStatus model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
-        }
-    }
-
-    /**
-     * Deletes an existing DocumentStatus model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
     }
 
     public function actionReceive()
@@ -184,7 +130,7 @@ class DocumentStatusController extends Controller
                 $document = Document::findOne($model->document_id);
                 
                 if ($model->action == DocumentStatus::ACTION_APPROVE) {
-                    $document->status = Document::FILE_RELEASE;
+                    $document->status = Document::FILE_RECEIVE;
                 } else if ($model->action == DocumentStatus::ACTION_DENY) {
                     $document->status = Document::FILE_DENY;
                 } else if ((\Yii::$app->user->identity->division_label === 'provincial') && ($model->action == DocumentStatus::ACTION_APPROVE)) {

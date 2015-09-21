@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'template' => '{view} {release}',
                 'buttons' => [
                     'view' => function($url, $model, $key) {
-                        return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['/qux/document/view', 'id' => $model->document_id], [
+                        return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['/qux/document-status/view', 'id' => $model->document_id], [
                             'title' => 'View',
                             'aria-label' => 'View',
                             'data-pjax' => 0,

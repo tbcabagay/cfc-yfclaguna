@@ -44,7 +44,8 @@ class AnnouncementSearch extends Announcement
     public function search($params)
     {
         $query = Announcement::find()
-            ->joinWith(['user', 'user.userProfiles']);
+            ->joinWith(['user', 'user.userProfiles'])
+            ->where(['announcement.status' => parent::STATUS_ACTIVE]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

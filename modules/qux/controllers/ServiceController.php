@@ -7,7 +7,9 @@ use app\models\Service;
 use app\models\ServiceSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * ServiceController implements the CRUD actions for Service model.
@@ -17,6 +19,15 @@ class ServiceController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -32,13 +43,17 @@ class ServiceController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new ServiceSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        if (\Yii::$app->user->can('createService')) {
+            $searchModel = new ServiceSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
+        } else {
+            throw new ForbiddenHttpException('You are not allowed to access this page');
+        }
     }
 
     /**
@@ -48,14 +63,18 @@ class ServiceController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Service();
+        if (\Yii::$app->user->can('createService')) {
+            $model = new Service();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return $this->redirect(['index']);
+            } else {
+                return $this->render('create', [
+                    'model' => $model,
+                ]);
+            }
         } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+            throw new ForbiddenHttpException('You are not allowed to access this page');
         }
     }
 
@@ -67,14 +86,18 @@ class ServiceController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        if (\Yii::$app->user->can('createService')) {
+            $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return $this->redirect(['index']);
+            } else {
+                return $this->render('update', [
+                    'model' => $model,
+                ]);
+            }
         } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+            throw new ForbiddenHttpException('You are not allowed to access this page');
         }
     }
 
@@ -86,9 +109,13 @@ class ServiceController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        if (\Yii::$app->user->can('createService')) {
+            $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+            return $this->redirect(['index']);
+        } else {
+            throw new ForbiddenHttpException('You are not allowed to access this page');
+        }
     }
 
     /**

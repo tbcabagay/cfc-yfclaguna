@@ -18,7 +18,7 @@ class m150912_154118_create_user_table extends Migration
             'password_hash' => $this->string(100),
             'email' => $this->string(255)->notNull(),
             'status' => $this->smallInteger()->notNull(),
-            'role' => $this->string(15)->notNull(),
+            'role' => $this->string(20)->notNull(),
             'created_at' => $this->dateTime()->notNull(),
             'updated_at' => $this->dateTime(),
         ]);

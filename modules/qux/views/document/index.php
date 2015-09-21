@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use kartik\grid\GridView;
+use yii\bootstrap\Alert;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\DocumentSearch */
@@ -11,6 +12,13 @@ $this->title = 'Documents';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="document-index">
+
+    <?php if (\Yii::$app->session->hasFlash('update-error')): ?>
+        <?= Alert::widget([
+            'options' => ['class' => 'alert-danger'],
+            'body' => \Yii::$app->session->getFlash('update-error'),
+        ]); ?>    
+    <?php endif; ?>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,

@@ -2,6 +2,7 @@
 
 use yii\bootstrap\Alert;
 use yii\helpers\Html;
+use yii\helpers\ArrayHelper;
 use kartik\form\ActiveForm;
 use kartik\widgets\DatePicker;
 
@@ -36,6 +37,8 @@ $this->title = 'Member Registration';
         <?= $form->field($user, 'service_id')->dropDownList($service->getList(), ['prompt' => 'Select...']) ?>
 
         <?= $form->field($user, 'cluster_id')->dropDownList($cluster->getList(), ['prompt' => 'Select...']) ?>
+
+        <?= $form->field($user, 'role')->dropdownList(ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'name'), ['prompt' => 'Select...']) ?>
     </fieldset>
 
     <fieldset>

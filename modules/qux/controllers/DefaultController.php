@@ -6,9 +6,25 @@ use Yii;
 use yii\web\Controller;
 use app\models\AnnouncementSearch;
 use app\models\UserProfileSearch;
+use yii\filters\AccessControl;
 
 class DefaultController extends Controller
 {
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
     public function actionIndex()
     {
         $searchModel = new AnnouncementSearch();

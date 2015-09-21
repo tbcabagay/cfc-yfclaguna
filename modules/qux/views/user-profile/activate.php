@@ -66,11 +66,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'condensed' => true,
             'hover' => true,
-            'toolbar'=> [
-                [
-                    'content' => Html::submitButton('<span class="glyphicon glyphicon-plus"></span> Activate', ['class' => 'btn btn-success', 'title' => 'Activate'])
-                ],
-            ],
+            'toolbar'=> false,
         ]); ?>
 
 </div>

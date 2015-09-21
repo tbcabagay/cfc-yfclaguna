@@ -77,6 +77,10 @@ class SiteController extends Controller
             $transaction = $user->getDb()->beginTransaction();
 
             if ($user->save()) {
+                $auth = Yii::$app->authManager;
+                $authorRole = $auth->getRole($user->role);
+                $auth->assign($authorRole, $user->id);
+
                 $userProfile->user_id = $user->id;
 
                 if ($userProfile->save()) {

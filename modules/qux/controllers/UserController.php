@@ -7,6 +7,7 @@ use app\models\User;
 use app\models\UserSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\filters\VerbFilter;
 use app\models\Service;
 use app\models\Chapter;
@@ -14,6 +15,7 @@ use app\models\Cluster;
 use app\models\Sector;
 use app\models\Provincial;
 use yii\helpers\Json;
+use yii\filters\AccessControl;
 
 /**
  * UserController implements the CRUD actions for User model.
@@ -23,6 +25,15 @@ class UserController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -38,15 +49,19 @@ class UserController extends Controller
      */
     public function actionIndex()
     {
-        $service = new Service();
-        $searchModel = new UserSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        if (\Yii::$app->user->can('createUser')) {
+            $service = new Service();
+            $searchModel = new UserSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'service' => $service,
-        ]);
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'service' => $service,
+            ]);
+        } else {
+            throw new ForbiddenHttpException('You are not allowed to access this page');
+        }
     }
 
     /**
@@ -56,9 +71,13 @@ class UserController extends Controller
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        if (\Yii::$app->user->can('createUser')) {
+            return $this->render('view', [
+                'model' => $this->findModel($id),
+            ]);
+        } else {
+            throw new ForbiddenHttpException('You are not allowed to access this page');
+        }
     }
 
     /**
@@ -68,18 +87,26 @@ class UserController extends Controller
      */
     public function actionCreate()
     {
-        $model = new User();
-        $service = new Service();
+        if (\Yii::$app->user->can('createUser')) {
+            $model = new User();
+            $service = new Service();
 
-        $model->scenario = User::SCENARIO_ADMIN_USER_REGISTER;
+            $model->scenario = User::SCENARIO_ADMIN_USER_REGISTER;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                $auth = Yii::$app->authManager;
+                $authorRole = $auth->getRole($model->role);
+                $auth->assign($authorRole, $model->id);
+
+                return $this->redirect(['index']);
+            } else {
+                return $this->render('create', [
+                    'model' => $model,
+                    'service' => $service,
+                ]);
+            }
         } else {
-            return $this->render('create', [
-                'model' => $model,
-                'service' => $service,
-            ]);
+            throw new ForbiddenHttpException('You are not allowed to access this page');
         }
     }
 
@@ -91,18 +118,22 @@ class UserController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
-        $service = new Service();
+        if (\Yii::$app->user->can('createUser')) {
+            $model = $this->findModel($id);
+            $service = new Service();
 
-        $model->scenario = User::SCENARIO_ADMIN_USER_REGISTER;
+            $model->scenario = User::SCENARIO_ADMIN_USER_REGISTER;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            } else {
+                return $this->render('update', [
+                    'model' => $model,
+                    'service' => $service,
+                ]);
+            }
         } else {
-            return $this->render('update', [
-                'model' => $model,
-                'service' => $service,
-            ]);
+            throw new ForbiddenHttpException('You are not allowed to access this page');
         }
     }
 
@@ -114,27 +145,35 @@ class UserController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        if (\Yii::$app->user->can('createUser')) {
+            $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+            return $this->redirect(['index']);
+        } else {
+            throw new ForbiddenHttpException('You are not allowed to access this page');
+        }
     }
 
     public function actionDivision()
     {
-        $out = [];
+        if (\Yii::$app->user->can('createUser')) {
+            $out = [];
 
-        if (isset($_POST['depdrop_parents'])) {
-            $parents = $_POST['depdrop_parents'];
+            if (isset($_POST['depdrop_parents'])) {
+                $parents = $_POST['depdrop_parents'];
 
-            if ($parents != null) {
-                $division = $parents[0];
-                $out = $this->getDivisionList($division);
-                echo Json::encode(['output'=>$out, 'selected'=>'']);
-                return;
+                if ($parents != null) {
+                    $division = $parents[0];
+                    $out = $this->getDivisionList($division);
+                    echo Json::encode(['output'=>$out, 'selected'=>'']);
+                    return;
+                }
             }
-        }
 
-        echo Json::encode(['output'=>'', 'selected'=>'']);
+            echo Json::encode(['output'=>'', 'selected'=>'']);
+        } else {
+            throw new ForbiddenHttpException('You are not allowed to access this page');
+        }
     }
 
     /**

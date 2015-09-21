@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\web\View;
 use kartik\form\ActiveForm;
+use yii\helpers\ArrayHelper;
 
 
 /* @var $this yii\web\View */
@@ -45,9 +46,8 @@ $this->registerJs("
 
         <?= $form->field($model, 'division_id')->dropDownList([], ['prompt' => 'Select...']) ?>
 
-<?php /*
-        <?= $form->field($model, 'role')->dropdownList($model->getRoleTypes()) ?>
-*/ ?>
+        <?= $form->field($model, 'role')->dropdownList(ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'name'), ['prompt' => 'Select...']) ?>
+
         <div class="form-group">
             <div class="col-sm-offset-2 col-md-9">
                 <?= Html::submitButton('Create', ['class' => 'btn btn-success']) ?>
