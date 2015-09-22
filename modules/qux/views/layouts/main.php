@@ -73,7 +73,7 @@ else
             ['label' => Html::img(\Yii::$app->session->get('userProfile.url'), ['alt' => 'profile picture', 'height' => 20, 'style' => 'margin-right: 8px;']) . \Yii::$app->session->get('userProfile.name'), 'items' => [
                     [
                         'label' => 'Profile',
-                        //'url' => ['/qux/user/profile', 'id' => \Yii::$app->user->identity->id],
+                        'url' => ['/qux/user-profile/view', 'id' => \Yii::$app->user->identity->id],
                     ],
                     [
                         'label' => 'Logout',

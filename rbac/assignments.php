@@ -3,7 +3,7 @@ return [
     3 => [
         'head',
     ],
-    4 => [
+    1 => [
         'couple_coordinator',
     ],
 ];

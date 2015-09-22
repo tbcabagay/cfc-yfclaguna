@@ -13,6 +13,7 @@ use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use yii\web\UploadedFile;
 
 /**
  * UserProfileController implements the CRUD actions for UserProfile model.
@@ -89,6 +90,29 @@ class UserProfileController extends Controller
             }
         } else {
             throw new ForbiddenHttpException('You are not allowed to access this page');
+        }
+    }
+
+    public function actionUploadPhoto($id)
+    {
+        $model = UserProfile::findOne(['user_id' => $id]);
+        $model->scenario = UserProfile::SCENARIO_UPLOAD_PHOTO;
+
+        if (\Yii::$app->user->identity->id == $model->user->id) {
+            if ($model->load(Yii::$app->request->post())) {
+                $model->image_file = UploadedFile::getInstance($model, 'image_file');
+
+                if ($model->save()) {
+                    if ($model->upload())
+                        return $this->redirect(['view', 'id' => $model->user->id]);
+                }
+            }
+
+            return $this->render('upload-photo', [
+                'model' => $model,
+            ]);
+        } else {
+            return $this->redirect(['view', 'id' => $model->user->id]);
         }
     }
 

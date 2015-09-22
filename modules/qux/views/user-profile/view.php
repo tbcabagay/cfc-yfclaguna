@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'image',
                 'format' => 'raw',
-                'value' => Html::img($model->image, ['height' => 50]),
+                'value' => \Yii::$app->user->identity->id == $model->user->id ? Html::img($model->image, ['height' => 50]) . ' ' . Html::a('<span class="glyphicon glyphicon-pencil"></span> Edit', ['/qux/user-profile/upload-photo', 'id' => $model->user->id], ['class' => 'btn btn-default']) : Html::img($model->image, ['height' => 50]),
                 'label' => false,
             ],
             'family_name',
